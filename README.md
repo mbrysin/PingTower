@@ -6,7 +6,7 @@
 
 track website health, report incidents, and explore uptime history.
 
-[![tests](https://github.com/mbrysin/PingTower/actions/workflows/tests.yml/badge.svg)](https://github.com/mbrysin/PingTower/actions/workflows/tests.yml)
+[![cov](https://mbrysin.github.io/PingTower/badges/test.svg)](https://github.com/mbrysin/PingTower/actions)
 
 <img src="https://skillicons.dev/icons?i=go,postgres,redis,docker,githubactions,html,css,typescript&theme=dark" alt="technology stack" />
 
@@ -100,19 +100,3 @@ pingtower/
 ├── go.sum
 └── README.md
 ```
-
-
-```markdown
-[![tests](https://github.com/mbrysin/PingTower/actions/workflows/tests.yml/badge.svg)](https://github.com/mbrysin/PingTower/actions/workflows/tests.yml)
-```
-
-## roadmap
-
-- [x] start the `auth` service
-- [ ] add a public status page
-- [ ] implement scheduled checks with `monitor` and `checker`
-- [ ] persist check history and build `stats`
-- [ ] add incident reporting for registered users
-- [ ] add redis caching and rate limiting
-- [ ] connect the services through `gateway`
-- [ ] add kafka-based event processing when asynchronous messaging is needed
