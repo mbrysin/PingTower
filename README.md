@@ -1,6 +1,6 @@
 <div align="center">
 
-# pingtower
+![PingTowerLogo](/images/PingTowerLightBg.svg)
 
 **website uptime monitoring, built with go**
 
