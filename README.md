@@ -6,7 +6,7 @@
 
 track website health, report incidents, and explore uptime history.
 
-[![Go tests](https://github.com/mbrysin/PingTower/actions/workflows/go-test.yml/badge.svg?branch=auth)](https://github.com/mbrysin/PingTower/actions/workflows/go-test.yml)
+[![Go tests](https://github.com/mbrysin/PingTower/actions/workflows/go-test.yml/badge.svg?branch=main)](https://github.com/mbrysin/PingTower/actions/workflows/go-test.yml)
 
 <img src="https://skillicons.dev/icons?i=go,postgres,redis,docker,githubactions,html,css,typescript&theme=dark" alt="technology stack" />
 
