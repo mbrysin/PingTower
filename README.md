@@ -4,6 +4,8 @@
 
 **website uptime monitoring, built with go**
 
+---
+
 track website health, report incidents, and explore uptime history.
 
 [![Go tests](https://github.com/mbrysin/PingTower/actions/workflows/go-test.yml/badge.svg?branch=monitor)](https://github.com/mbrysin/PingTower/actions/workflows/go-test.yml)
