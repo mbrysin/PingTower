@@ -1,6 +1,6 @@
 <div align="center">
 
-![PingTowerLogo](/images/PingTowerLightBg.svg)
+[![PingTowerLogo](/images/PingTowerLightBg.svg)](https://github.com/mbrysin/PingTower)
 
 **website uptime monitoring, built with go**
 
@@ -8,7 +8,7 @@ track website health, report incidents, and explore uptime history.
 
 [![Go tests](https://github.com/mbrysin/PingTower/actions/workflows/go-test.yml/badge.svg?branch=auth)](https://github.com/mbrysin/PingTower/actions/workflows/go-test.yml)
 
-<img src="https://skillicons.dev/icons?i=go,postgres,redis,docker,githubactions,html,css,typescript&theme=dark" alt="technology stack" />
+[![Go](https://skillicons.dev/icons?i=go)](https://go.dev/) [![PostgreSQL](https://skillicons.dev/icons?i=postgres)](https://www.postgresql.org/) [![Redis](https://skillicons.dev/icons?i=redis)](https://redis.io/) [![Docker](https://skillicons.dev/icons?i=docker)](https://www.docker.com/) [![HTML](https://skillicons.dev/icons?i=html)](https://html.spec.whatwg.org/) [![CSS](https://skillicons.dev/icons?i=css)](https://www.w3.org/Style/CSS/) 
 
 </div>
 
