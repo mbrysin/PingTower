@@ -78,8 +78,8 @@ func TestUsers_Create(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Create() error = %v", err)
 	}
-	if created.Id == 0 {
-		t.Error("Create() не установил Id")
+	if created.ID == 0 {
+		t.Error("Create() не установил ID")
 	}
 	if created.Username != "alice" {
 		t.Errorf("Create() username = %s, want alice", created.Username)
@@ -113,11 +113,11 @@ func TestUsers_Get(t *testing.T) {
 		t.Fatalf("Create() error = %v", err)
 	}
 
-	got, err := repo.Get(ctx, created.Id)
+	got, err := repo.Get(ctx, created.ID)
 	if err != nil {
 		t.Fatalf("Get() error = %v", err)
 	}
-	if got.Id != created.Id || got.Username != created.Username {
+	if got.ID != created.ID || got.Username != created.Username {
 		t.Errorf("Get() = %+v, want %+v", got, created)
 	}
 
@@ -143,8 +143,8 @@ func TestUsers_GetByUsername(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetByUsername() error = %v", err)
 	}
-	if got.Id != created.Id {
-		t.Errorf("GetByUsername() id = %d, want %d", got.Id, created.Id)
+	if got.ID != created.ID {
+		t.Errorf("GetByUsername() id = %d, want %d", got.ID, created.ID)
 	}
 
 	_, err = repo.GetByUsername(ctx, "nonexistent")
@@ -218,7 +218,7 @@ func TestUsers_UpdateUsername(t *testing.T) {
 		t.Fatalf("Create() error = %v", err)
 	}
 
-	updated, err := repo.UpdateUsername(ctx, created.Id, "dave_new")
+	updated, err := repo.UpdateUsername(ctx, created.ID, "dave_new")
 	if err != nil {
 		t.Fatalf("UpdateUsername() error = %v", err)
 	}
@@ -236,7 +236,7 @@ func TestUsers_UpdateUsername(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Create() error = %v", err)
 	}
-	_, err = repo.UpdateUsername(ctx, created.Id, "eve")
+	_, err = repo.UpdateUsername(ctx, created.ID, "eve")
 	if !errors.Is(err, ErrUsernameTaken) {
 		t.Errorf("UpdateUsername() error = %v, want ErrUsernameTaken", err)
 	}
@@ -254,7 +254,7 @@ func TestUsers_UpdatePassword(t *testing.T) {
 		t.Fatalf("Create() error = %v", err)
 	}
 
-	_, err = repo.UpdatePassword(ctx, created.Id, "new_hash")
+	_, err = repo.UpdatePassword(ctx, created.ID, "new_hash")
 	if err != nil {
 		t.Fatalf("UpdatePassword() error = %v", err)
 	}
@@ -277,12 +277,12 @@ func TestUsers_Delete(t *testing.T) {
 		t.Fatalf("Create() error = %v", err)
 	}
 
-	err = repo.Delete(ctx, created.Id)
+	err = repo.Delete(ctx, created.ID)
 	if err != nil {
 		t.Fatalf("Delete() error = %v", err)
 	}
 
-	err = repo.Delete(ctx, created.Id)
+	err = repo.Delete(ctx, created.ID)
 	if !errors.Is(err, ErrUserNotFound) {
 		t.Errorf("Delete() error = %v, want ErrUserNotFound", err)
 	}

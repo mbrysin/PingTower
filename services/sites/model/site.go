@@ -5,9 +5,9 @@ import (
 )
 
 type Site struct {
-	Id        int       `json:"id"`
+	ID        int       `json:"id"`
 	Name      string    `json:"name"`
-	Url       string    `json:"url"`
+	URL       string    `json:"url"`
 	Enabled   bool      `json:"enabled"`
 	CreatedAt time.Time `json:"created_at"`
 }
