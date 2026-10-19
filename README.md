@@ -27,7 +27,7 @@ pingtower is a website monitoring service. visitors can view website statuses an
 - [ ] **checker** — checks website availability and records results.
 - [ ] **frontend** — user interface for statuses, charts, and incident reports.
 - [ ] **gateway** — single entry point that routes requests to backend services.
-- [ ] **monitor** — manages monitored websites and schedules checks.
+- [ ] **sites** — manages monitored websites and schedules checks.
 - [ ] **stats** — stores and aggregates check history for statistics and charts.
 
 ## architecture
@@ -44,7 +44,7 @@ pingtower is a website monitoring service. visitors can view website statuses an
              ┌─────────────┘   │   └─────────────┐
              ▼                 ▼                 ▼
         ┌─────────┐      ┌──────────┐       ┌─────────┐
-        │  auth   │      │ monitor  │       │  stats  │
+        │  auth   │      │  sites   │       │  stats  │
         └─────────┘      └────┬─────┘       └────▲────┘
                               ▼                  │
                          ┌─────────┐             │
@@ -77,16 +77,31 @@ pingtower/
 │   ├── auth/
 │   │   ├── migrations/
 │   │   ├── Dockerfile
-│   │   └── ...
+│   │   ├── handler/
+│   │   ├── middleware/
+│   │   ├── model/
+│   │   ├── repo/
+│   │   ├── service/
+│   │   ├── token/
+│   │   ├── .env
+│   │   ├── .env.example
+│   │   └── main.go
 │   ├── checker/
 │   │   ├── Dockerfile
 │   │   └── ...
 │   ├── gateway/
 │   │   ├── Dockerfile
 │   │   └── ...
-│   ├── monitor/
+│   ├── sites/
+│   │   ├── migrations/
 │   │   ├── Dockerfile
-│   │   └── ...
+│   │   ├── handler/
+│   │   ├── model/
+│   │   ├── repo/
+│   │   ├── service/
+│   │   ├── .env
+│   │   ├── .env.example
+│   │   └── main.go
 │   └── stats/
 │       ├── Dockerfile
 │       └── ...
