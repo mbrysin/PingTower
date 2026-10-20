@@ -70,7 +70,7 @@ func (h *Handler) Register(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, userResponse{
-		ID:       user.Id,
+		ID:       user.ID,
 		Username: user.Username,
 	})
 }
@@ -93,14 +93,14 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
-	rawToken, err := h.tokens.Issue(user.Id)
+	rawToken, err := h.tokens.Issue(user.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not create token"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"id":       user.Id,
+		"id":       user.ID,
 		"username": user.Username,
 		"token":    rawToken,
 	})

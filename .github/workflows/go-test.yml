@@ -2,9 +2,9 @@ name: Go tests
 
 on:
   push:
-    branches: [auth]
+    branches: ["main"]
   pull_request:
-    branches: [auth]
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:

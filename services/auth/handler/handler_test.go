@@ -32,14 +32,14 @@ func (f fakeAuthService) Register(context.Context, string, string) (*model.User,
 	if f.err != nil {
 		return nil, f.err
 	}
-	return &model.User{Id: 1, Username: "alice"}, nil
+	return &model.User{ID: 1, Username: "alice"}, nil
 }
 
 func (f fakeAuthService) Authenticate(context.Context, string, string) (*model.User, error) {
 	if f.err != nil {
 		return nil, f.err
 	}
-	return &model.User{Id: 1, Username: "alice"}, nil
+	return &model.User{ID: 1, Username: "alice"}, nil
 }
 
 func TestRegister(t *testing.T) {

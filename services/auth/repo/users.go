@@ -50,7 +50,7 @@ func (r *Users) Create(ctx context.Context, u *model.User) (*model.User, error) 
 	`
 
 	err := r.db.QueryRow(ctx, q, u.Username, u.PasswordHash).Scan(
-		&u.Id,
+		&u.ID,
 		&u.Username,
 		&u.CreatedAt,
 	)
@@ -77,11 +77,12 @@ func (r *Users) Get(ctx context.Context, id int) (*model.User, error) {
 
 	var u model.User
 	err := r.db.QueryRow(ctx, q, id).Scan(
-		&u.Id,
+		&u.ID,
 		&u.Username,
 		&u.PasswordHash,
 		&u.CreatedAt,
 	)
+
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, ErrUserNotFound
@@ -104,7 +105,7 @@ func (r *Users) GetByUsername(ctx context.Context, username string) (*model.User
 
 	var u model.User
 	err := r.db.QueryRow(ctx, q, username).Scan(
-		&u.Id,
+		&u.ID,
 		&u.Username,
 		&u.PasswordHash,
 		&u.CreatedAt,
@@ -152,7 +153,7 @@ func (r *Users) List(ctx context.Context, p ListParams) ([]*model.User, error) {
 	for rows.Next() {
 		var u model.User
 		if err := rows.Scan(
-			&u.Id,
+			&u.ID,
 			&u.Username,
 			&u.PasswordHash,
 			&u.CreatedAt,
@@ -178,14 +179,13 @@ func (r *Users) UpdateUsername(ctx context.Context, id int, username string) (*m
 		UPDATE users
 		SET username = $2
 		WHERE id = $1
-		RETURNING id, username, password_hash, created_at
+		RETURNING id, username, created_at
 	`
 
 	var u model.User
 	err := r.db.QueryRow(ctx, q, id, username).Scan(
-		&u.Id,
+		&u.ID,
 		&u.Username,
-		&u.PasswordHash,
 		&u.CreatedAt,
 	)
 	if err != nil {
@@ -210,14 +210,13 @@ func (r *Users) UpdatePassword(ctx context.Context, id int, passwordHash string)
 		UPDATE users
 		SET password_hash = $2
 		WHERE id = $1
-		RETURNING id, username, password_hash, created_at
+		RETURNING id, username, created_at
 	`
 
 	var u model.User
 	err := r.db.QueryRow(ctx, q, id, passwordHash).Scan(
-		&u.Id,
+		&u.ID,
 		&u.Username,
-		&u.PasswordHash,
 		&u.CreatedAt,
 	)
 	if err != nil {

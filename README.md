@@ -1,14 +1,20 @@
 <div align="center">
 
-![PingTowerLogo](/images/PingTowerLightBg.svg)
+[![PingTowerLogo](/images/PingTowerLightBg.svg)](https://github.com/mbrysin/PingTower)
 
 **website uptime monitoring, built with go**
 
+---
+
 track website health, report incidents, and explore uptime history.
 
+<<<<<<< HEAD
+[![Go tests](https://github.com/mbrysin/PingTower/actions/workflows/go-test.yml/badge.svg?branch=monitor)](https://github.com/mbrysin/PingTower/actions/workflows/go-test.yml)
+=======
 [![Go tests](https://github.com/mbrysin/PingTower/actions/workflows/go-test.yml/badge.svg?branch=main)](https://github.com/mbrysin/PingTower/actions/workflows/go-test.yml)
+>>>>>>> d0dd9ebab55b00e2c549dc68d67d3c549efb1cd3
 
-<img src="https://skillicons.dev/icons?i=go,postgres,redis,docker,githubactions,html,css,typescript&theme=dark" alt="technology stack" />
+[![Go](https://skillicons.dev/icons?i=go)](https://go.dev/) [![PostgreSQL](https://skillicons.dev/icons?i=postgres)](https://www.postgresql.org/) [![Redis](https://skillicons.dev/icons?i=redis)](https://redis.io/) [![Docker](https://skillicons.dev/icons?i=docker)](https://www.docker.com/) [![HTML](https://skillicons.dev/icons?i=html)](https://html.spec.whatwg.org/) [![CSS](https://skillicons.dev/icons?i=css)](https://www.w3.org/Style/CSS/) 
 
 </div>
 
@@ -25,7 +31,7 @@ pingtower is a website monitoring service. visitors can view website statuses an
 - [ ] **checker** — checks website availability and records results.
 - [ ] **frontend** — user interface for statuses, charts, and incident reports.
 - [ ] **gateway** — single entry point that routes requests to backend services.
-- [ ] **monitor** — manages monitored websites and schedules checks.
+- [ ] **sites** — manages monitored websites and schedules checks.
 - [ ] **stats** — stores and aggregates check history for statistics and charts.
 
 ## architecture
@@ -42,7 +48,7 @@ pingtower is a website monitoring service. visitors can view website statuses an
              ┌─────────────┘   │   └─────────────┐
              ▼                 ▼                 ▼
         ┌─────────┐      ┌──────────┐       ┌─────────┐
-        │  auth   │      │ monitor  │       │  stats  │
+        │  auth   │      │  sites   │       │  stats  │
         └─────────┘      └────┬─────┘       └────▲────┘
                               ▼                  │
                          ┌─────────┐             │
@@ -75,16 +81,31 @@ pingtower/
 │   ├── auth/
 │   │   ├── migrations/
 │   │   ├── Dockerfile
-│   │   └── ...
+│   │   ├── handler/
+│   │   ├── middleware/
+│   │   ├── model/
+│   │   ├── repo/
+│   │   ├── service/
+│   │   ├── token/
+│   │   ├── .env
+│   │   ├── .env.example
+│   │   └── main.go
 │   ├── checker/
 │   │   ├── Dockerfile
 │   │   └── ...
 │   ├── gateway/
 │   │   ├── Dockerfile
 │   │   └── ...
-│   ├── monitor/
+│   ├── sites/
+│   │   ├── migrations/
 │   │   ├── Dockerfile
-│   │   └── ...
+│   │   ├── handler/
+│   │   ├── model/
+│   │   ├── repo/
+│   │   ├── service/
+│   │   ├── .env
+│   │   ├── .env.example
+│   │   └── main.go
 │   └── stats/
 │       ├── Dockerfile
 │       └── ...

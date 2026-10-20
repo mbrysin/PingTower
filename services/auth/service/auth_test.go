@@ -40,9 +40,9 @@ func (r *fakeUserRepository) Create(_ context.Context, user *model.User) (*model
 		return nil, r.createErr
 	}
 
-	user.Id = r.nextID
+	user.ID = r.nextID
 	r.nextID++
-	r.users[user.Id] = *user
+	r.users[user.ID] = *user
 	return user, nil
 }
 
@@ -152,7 +152,7 @@ func TestRegister(t *testing.T) {
 		if user.Username != "alice" {
 			t.Errorf("Username = %q, want %q", user.Username, "alice")
 		}
-		if user.Id == 0 {
+		if user.ID == 0 {
 			t.Error("expected repository to assign user ID")
 		}
 		if user.PasswordHash == "" || user.PasswordHash == "password123" {
@@ -210,8 +210,8 @@ func TestAuthenticate(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Authenticate() error = %v", err)
 		}
-		if user.Id != createdUser.Id {
-			t.Errorf("user ID = %d, want %d", user.Id, createdUser.Id)
+		if user.ID != createdUser.ID {
+			t.Errorf("user ID = %d, want %d", user.ID, createdUser.ID)
 		}
 	})
 
