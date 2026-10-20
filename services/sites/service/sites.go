@@ -3,10 +3,17 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/url"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/mbrysin/PingTower/services/sites/model"
+)
+
+const (
+	maxSiteNameLength = 100
+	maxSiteURLBytes   = 2048
 )
 
 var ErrInvalidSite = errors.New("invalid site")
@@ -32,7 +39,8 @@ func (s *SiteService) Create(ctx context.Context, name string, rawURL string) (*
 	name = strings.TrimSpace(name)
 	rawURL = strings.TrimSpace(rawURL)
 
-	if name == "" || !validURL(rawURL) {
+	if name == "" || utf8.RuneCountInString(name) > maxSiteNameLength ||
+		!validURL(rawURL) || len(rawURL) > maxSiteURLBytes {
 		return nil, ErrInvalidSite
 	}
 
@@ -59,12 +67,18 @@ func (s *SiteService) Get(ctx context.Context, id int) (*model.Site, error) {
 }
 
 func (s *SiteService) List(ctx context.Context, limit, offset int) ([]model.Site, error) {
+	if limit <= 0 {
+		return nil, fmt.Errorf("list sites: limit must be greater than 0")
+	}
+	if offset < 0 {
+		return nil, fmt.Errorf("list sites: offset must not be negative")
+	}
 	return s.sites.List(ctx, limit, offset)
 }
 
 func (s *SiteService) UpdateName(ctx context.Context, id int, name string) (*model.Site, error) {
 	name = strings.TrimSpace(name)
-	if id <= 0 || name == "" {
+	if id <= 0 || name == "" || utf8.RuneCountInString(name) > maxSiteNameLength {
 		return nil, ErrInvalidSite
 	}
 

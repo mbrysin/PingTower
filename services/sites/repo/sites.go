@@ -171,7 +171,7 @@ func (r *Sites) UpdateName(ctx context.Context, id int, name string) (*model.Sit
 		return nil, fmt.Errorf("update site: %w", err)
 	}
 
-	return &s, err
+	return &s, nil
 }
 
 func (r *Sites) SetEnabled(ctx context.Context, id int, enabled bool) (*model.Site, error) {

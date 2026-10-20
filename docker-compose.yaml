@@ -5,8 +5,10 @@ services:
       POSTGRES_USER: test
       POSTGRES_PASSWORD: test
       POSTGRES_DB: app_db
+    ports:
+      - "5432:5432"
     volumes:
-      - auth_postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U test -d app_db"]
       interval: 5s
@@ -26,5 +28,17 @@ services:
       postgres:
         condition: service_healthy
 
+  sites:
+    build:
+      context: .
+      dockerfile: services/sites/Dockerfile
+    environment:
+      DATABASE_URL: postgres://test:test@postgres:5432/app_db?sslmode=disable
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
-  auth_postgres_data:
+  postgres_data:
