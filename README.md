@@ -87,8 +87,13 @@ pingtower/
 │   │   ├── .env.example
 │   │   └── main.go
 │   ├── checker/
+│   │   ├── migrations/
 │   │   ├── Dockerfile
-│   │   └── ...
+│   │   ├── model/
+│   │   ├── repo/
+│   │   ├── checker/
+│   │   ├── cache/
+│   │   └── main.go
 │   ├── gateway/
 │   │   ├── Dockerfile
 │   │   └── ...
