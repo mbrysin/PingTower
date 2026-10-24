@@ -4,7 +4,7 @@ CREATE TABLE sites (
     id          INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name        TEXT NOT NULL UNIQUE,
     url         TEXT NOT NULL UNIQUE,
-    enabled     BOOLEAN NOT NULL DEFAULT FALSE,
+    enabled     BOOLEAN NOT NULL DEFAULT TRUE,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 -- +goose StatementEnd
