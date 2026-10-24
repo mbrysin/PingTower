@@ -24,10 +24,10 @@ pingtower is a website monitoring service. visitors can view website statuses an
 ## components
 
 - [x] **auth** — user registration and login.
+- [x] **sites** — manages monitored websites and schedules checks.
 - [x] **checker** — checks website availability and records results.
 - [ ] **frontend** — user interface for statuses, charts, and incident reports.
 - [ ] **gateway** — single entry point that routes requests to backend services.
-- [x] **sites** — manages monitored websites and schedules checks.
 - [ ] **stats** — stores and aggregates check history for statistics and charts.
 
 ## architecture
