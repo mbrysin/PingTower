@@ -3,7 +3,7 @@
 CREATE TABLE check_results (
     id               INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     site_id          INTEGER NOT NULL REFERENCES sites(id) ON DELETE CASCADE,
-    checked_at       TIMESTAMPTZ NOT NULL,
+    checked_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     is_up            BOOLEAN NOT NULL,
     status_code      INTEGER,
     response_time_ms INTEGER,
