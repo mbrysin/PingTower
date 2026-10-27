@@ -20,7 +20,7 @@ func Check(ctx context.Context, rawURL string) model.CheckResult {
 		return result
 	}
 
-	req.Header.Set("User-Agent", "PingTower/0.0-alpha")
+	req.Header.Set("User-Agent", "PingTower/0.0.0-pre-alpha")
 
 	client := &http.Client{
 		Timeout: 8 * time.Second,

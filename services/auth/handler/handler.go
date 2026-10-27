@@ -43,10 +43,7 @@ type loginRequest struct {
 type userResponse struct {
 	ID       int    `json:"id"`
 	Username string `json:"username"`
-}
-
-type tokenIssuer interface {
-	Issue(userID int) (string, error)
+	Token    string `json:"token"`
 }
 
 func (h *Handler) Register(c *gin.Context) {
@@ -69,9 +66,16 @@ func (h *Handler) Register(c *gin.Context) {
 		return
 	}
 
+	rawToken, err := h.tokens.Issue(user.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not create token"})
+		return
+	}
+
 	c.JSON(http.StatusCreated, userResponse{
 		ID:       user.ID,
 		Username: user.Username,
+		Token:    rawToken,
 	})
 }
 

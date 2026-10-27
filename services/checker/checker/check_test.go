@@ -26,7 +26,7 @@ func TestCheck(t *testing.T) {
 				w http.ResponseWriter,
 				r *http.Request,
 			) {
-				if got := r.Header.Get("User-Agent"); got != "PingTower/0.0-alpha" {
+				if got := r.Header.Get("User-Agent"); got != "PingTower/0.0.0-pre-alpha" {
 					t.Errorf("User-Agent = %q", got)
 				}
 				w.WriteHeader(tt.statusCode)
@@ -56,8 +56,8 @@ func TestCheckSendsGETAndUserAgent(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %q, want GET", r.Method)
 		}
-		if got := r.Header.Get("User-Agent"); got != "PingTower/0.0-alpha" {
-			t.Errorf("User-Agent = %q, want PingTower/0.0-alpha", got)
+		if got := r.Header.Get("User-Agent"); got != "PingTower/0.0.0-pre-alpha" {
+			t.Errorf("User-Agent = %q, want PingTower/0.0.0-pre-alpha", got)
 		}
 		w.WriteHeader(http.StatusOK)
 	}))

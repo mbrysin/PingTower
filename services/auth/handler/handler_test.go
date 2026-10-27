@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -14,14 +15,25 @@ import (
 	"github.com/mbrysin/PingTower/services/auth/service"
 )
 
-type fakeTokenManager struct{}
+type fakeTokenManager struct {
+	issueErr error
+}
 
-func (fakeTokenManager) Issue(userID int) (string, error) {
+func (f fakeTokenManager) Issue(userID int) (string, error) {
+	if f.issueErr != nil {
+		return "", f.issueErr
+	}
 	return "test-token", nil
 }
 
 func (fakeTokenManager) Verify(raw string) (int, error) {
 	return 1, nil
+}
+
+type responseBody struct {
+	ID       int    `json:"id"`
+	Username string `json:"username"`
+	Token    string `json:"token"`
 }
 
 type fakeAuthService struct {
@@ -72,7 +84,44 @@ func TestRegister(t *testing.T) {
 			if rec.Code != tt.wantStatus {
 				t.Errorf("status = %d, want %d; body: %s", rec.Code, tt.wantStatus, rec.Body.String())
 			}
+
+			if tt.name == "success" {
+				var got responseBody
+				if err := json.Unmarshal(rec.Body.Bytes(), &got); err != nil {
+					t.Fatalf("invalid JSON response: %v", err)
+				}
+
+				if got.ID != 1 || got.Username != "alice" || got.Token != "test-token" {
+					t.Errorf("response = %+v, want id=1, username=alice, token=test-token", got)
+				}
+			}
 		})
+	}
+}
+
+func TestRegisterTokenIssueError(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	router := gin.New()
+	handler := New(
+		fakeAuthService{},
+		fakeTokenManager{issueErr: errors.New("token error")},
+	)
+	router.POST("/auth/register", handler.Register)
+
+	req := httptest.NewRequest(
+		http.MethodPost,
+		"/auth/register",
+		strings.NewReader(`{"username":"alice","password":"password123"}`),
+	)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusInternalServerError {
+		t.Errorf("status = %d, want %d; body: %s",
+			rec.Code, http.StatusInternalServerError, rec.Body.String())
 	}
 }
 
@@ -103,6 +152,17 @@ func TestLogin(t *testing.T) {
 
 			if rec.Code != tt.wantStatus {
 				t.Errorf("status = %d, want %d; body: %s", rec.Code, tt.wantStatus, rec.Body.String())
+			}
+
+			if tt.name == "success" {
+				var got responseBody
+				if err := json.Unmarshal(rec.Body.Bytes(), &got); err != nil {
+					t.Fatalf("invalid JSON response: %v", err)
+				}
+
+				if got.ID != 1 || got.Username != "alice" || got.Token != "test-token" {
+					t.Errorf("response = %+v, want id=1, username=alice, token=test-token", got)
+				}
 			}
 		})
 	}

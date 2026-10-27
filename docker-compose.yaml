@@ -66,6 +66,26 @@ services:
       redis:
         condition: service_healthy
 
+  gateway:
+    build:
+      context: .
+      dockerfile: services/gateway/Dockerfile
+    environment:
+      AUTH_URL: http://auth:8080
+      SITES_URL: http://sites:8081
+      PORT: "8082"
+      REDIS_ADDR: redis:6379
+    ports:
+      - "8082:8082"
+    depends_on:
+      auth:
+        condition: service_started
+      sites:
+        condition: service_started
+      redis:
+        condition: service_healthy
+
+
 
 volumes:
   postgres_data:
