@@ -2,23 +2,33 @@ package model
 
 import "time"
 
-type CheckResult struct {
-	ID             int       `json:"id"`
-	SiteID         int       `json:"site_id"`
-	CheckedAt      time.Time `json:"checked_at"`
-	IsUp           bool      `json:"is_up"`
-	StatusCode     int       `json:"status_code"`
-	ResponseTimeMs int64     `json:"response_time_ms"`
-	Error          string    `json:"error,omitempty"`
+type Site struct {
+	ID      int    `json:"id"`
+	Name    string `json:"name"`
+	URL     string `json:"url"`
+	Enabled bool   `json:"enabled"`
 }
 
-type SiteDailyStat struct {
-	ID            int       `json:"id"`
-	SiteID        int       `json:"site_id"`
-	Date          time.Time `json:"date"`
-	Status        string    `json:"status"`
-	ChecksTotal   int       `json:"checks_total"`
-	ChecksFailed  int       `json:"checks_failed"`
-	UptimePercent float64   `json:"uptime_percent"`
-	LastCheckedAt time.Time `json:"last_checked_at"`
+type Stat struct {
+	ID             int       `db:"id"               json:"id"`
+	SiteID         int       `db:"site_id"          json:"site_id"`
+	CheckedAt      time.Time `db:"checked_at"       json:"checked_at"`
+	IsUp           bool      `db:"is_up"            json:"is_up"`
+	StatusCode     *int32    `db:"status_code"      json:"status_code,omitempty"`
+	ResponseTimeMs *int32    `db:"response_time_ms" json:"response_time_ms,omitempty"`
+	Error          *string   `db:"error"            json:"error,omitempty"`
 }
+
+//
+// type DailyStat struct {
+// 	ID                int        `db:"id"                  json:"id"`
+// 	SiteID            int        `db:"site_id"             json:"site_id"`
+// 	StatDate          time.Time  `db:"stat_date"           json:"stat_date"`
+// 	Checks            int        `db:"checks"              json:"checks"`
+// 	FailedChecks      int        `db:"failed_checks"       json:"failed_checks"`
+// 	SuccessPercent    *float64   `db:"success_percent"     json:"success_percent"`
+// 	LastCheck         *time.Time `db:"last_check"          json:"last_check"`
+// 	AvgResponseTimeMs *float64   `db:"avg_response_time_ms" json:"avg_response_time_ms"`
+// 	MinResponseTimeMs *int64     `db:"min_response_time_ms" json:"min_response_time_ms"`
+// 	MaxResponseTimeMs *int64     `db:"max_response_time_ms" json:"max_response_time_ms"`
+// }

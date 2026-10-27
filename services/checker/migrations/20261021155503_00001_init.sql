@@ -1,39 +1,35 @@
 -- +goose Up
--- +goose StatementBegin
-CREATE TABLE check_results (
+CREATE TABLE stat (
     id               INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    site_id          INTEGER NOT NULL REFERENCES sites(id) ON DELETE CASCADE,
-    checked_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    site_id          INTEGER NOT NULL REFERENCES sites(id) ON DELETE RESTRICT,
+    checked_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
     is_up            BOOLEAN NOT NULL,
     status_code      INTEGER,
-    response_time_ms INTEGER,
+    response_time_ms INTEGER CHECK (response_time_ms IS NULL OR response_time_ms >= 0),
     error            TEXT
 );
 
-CREATE INDEX idx_check_results_site_checked_at
-    ON check_results (site_id, checked_at DESC);
+CREATE INDEX idx_stat_site_checked_at
+    ON stat (site_id, checked_at DESC);
 
-CREATE TABLE site_daily_stats (
-    id                INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    site_id           INTEGER NOT NULL REFERENCES sites(id) ON DELETE CASCADE,
-    date              DATE NOT NULL,
-    status            TEXT NOT NULL DEFAULT 'unknown',
-    checks_total      INTEGER NOT NULL DEFAULT 0,
-    checks_failed     INTEGER NOT NULL DEFAULT 0,
-    uptime_percent    NUMERIC(5, 2),
-    last_checked_at   TIMESTAMPTZ,
+-- CREATE TABLE daily_stat (
+--     id                  INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+--     site_id             INTEGER NOT NULL REFERENCES sites(id) ON DELETE RESTRICT,
+--     stat_date           DATE NOT NULL,
+--     checks              INTEGER NOT NULL DEFAULT 0 CHECK (checks >= 0),
+--     failed_checks       INTEGER NOT NULL DEFAULT 0 CHECK (failed_checks >= 0),
+--     success_percent     NUMERIC(5,2)
+--         CHECK (success_percent IS NULL OR success_percent BETWEEN 0 AND 100),
+--     last_check          TIMESTAMPTZ,
+--     avg_response_time_ms NUMERIC(10,2),
+--     min_response_time_ms INTEGER,
+--     max_response_time_ms INTEGER,
+--
+--     CONSTRAINT daily_stat_site_date_uq UNIQUE (site_id, stat_date),
+--     CONSTRAINT daily_stat_failed_le_checks CHECK (failed_checks <= checks),
+--     CONSTRAINT daily_stat_percent_when_checks CHECK (checks > 0 OR success_percent IS NULL)
+-- );
 
-    UNIQUE (site_id, date),
-    CHECK (status IN ('unknown', 'up', 'degraded', 'down')),
-    CHECK (checks_total >= 0),
-    CHECK (checks_failed >= 0),
-    CHECK (checks_failed <= checks_total),
-    CHECK (uptime_percent IS NULL OR uptime_percent BETWEEN 0 AND 100)
-);
-
--- +goose StatementEnd
 -- +goose Down
--- +goose StatementBegin
-DROP TABLE check_results;
-DROP TABLE site_daily_stats;
--- +goose StatementEnd
+DROP TABLE IF EXISTS daily_stat;
+-- DROP TABLE IF EXISTS stat;
