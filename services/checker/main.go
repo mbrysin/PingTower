@@ -61,6 +61,9 @@ func main() {
 	statsRepo := repo.NewStats(pgPool, logger)
 	redisStatsRepo := repo.NewRedisStats(redisClient, retention)
 
+	dailyStatsRepo := repo.NewDailyStats(pgPool, logger)
+	go runDailyAggregation(ctx, dailyStatsRepo, logger)
+
 	checker, err := service.New(
 		sitesRepo,
 		statsRepo,
@@ -112,4 +115,40 @@ func envInt(name string, fallback int) int {
 		log.Fatalf("environment variable %s must be a positive integer", name)
 	}
 	return n
+}
+
+type dailyAggregator interface {
+	AggregateDay(ctx context.Context, day time.Time) error
+}
+
+func runDailyAggregation(
+	ctx context.Context,
+	aggregator dailyAggregator,
+	logger *slog.Logger,
+) {
+	run := func() {
+		yesterday := time.Now().UTC().AddDate(0, 0, -1)
+		day := time.Date(
+			yesterday.Year(), yesterday.Month(), yesterday.Day(),
+			0, 0, 0, 0, time.UTC,
+		)
+
+		if err := aggregator.AggregateDay(ctx, day); err != nil {
+			logger.ErrorContext(ctx, "daily aggregation failed", "day", day, "err", err)
+		}
+	}
+
+	run()
+
+	ticker := time.NewTicker(24 * time.Hour)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			run()
+		}
+	}
 }
