@@ -27,7 +27,6 @@ pingtower is a website monitoring service. visitors can view website statuses an
 - **backend:** gin + rest api
 - **database:** postgresql + goose migrations
 - **cache and rate limiting:** redis
-- **messaging:** kafka
 - **security:** bcrypt
 - **infrastructure:** docker + docker compose
 - **testing and ci:** go test + github actions
