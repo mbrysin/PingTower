@@ -17,25 +17,30 @@ services:
 
   redis:
     image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 3s
       retries: 10
-
-  auth:
-    build:
-      context: .
-      dockerfile: services/auth/Dockerfile
-    environment:
-      DATABASE_URL: postgres://test:test@postgres:5432/app_db?sslmode=disable
-
-      JWT_SECRET: testtesttesttesttesttesttesttest
-    ports:
-      - "8080:8080"
-    depends_on:
-      postgres:
-        condition: service_healthy
+#
+#   auth:
+#     build:
+#       context: .
+#       dockerfile: services/auth/Dockerfile
+#     environment:
+#       DATABASE_URL: postgres://test:test@postgres:5432/app_db?sslmode=disable
+#       JWT_SECRET: testtesttesttesttesttesttesttest
+#     ports:
+#       - "8080:8080"
+#     depends_on:
+#       postgres:
+#         condition: service_healthy
 
   sites:
     build:
@@ -43,7 +48,6 @@ services:
       dockerfile: services/sites/Dockerfile
     environment:
       DATABASE_URL: postgres://test:test@postgres:5432/app_db?sslmode=disable
-
     ports:
       - "8081:8081"
     depends_on:
@@ -57,35 +61,14 @@ services:
     environment:
       DATABASE_URL: postgres://test:test@postgres:5432/app_db?sslmode=disable
       REDIS_ADDR: redis:6379
-      CHECK_INTERVAL: 1m
-      SITES_RELOAD_INTERVAL: 5m
-      CHECKER_WORKERS: 10
+      CHECK_INTERVAL: "1"
+      WORKERS: "10"
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
 
-  gateway:
-    build:
-      context: .
-      dockerfile: services/gateway/Dockerfile
-    environment:
-      AUTH_URL: http://auth:8080
-      SITES_URL: http://sites:8081
-      PORT: "8082"
-      REDIS_ADDR: redis:6379
-    ports:
-      - "8082:8082"
-    depends_on:
-      auth:
-        condition: service_started
-      sites:
-        condition: service_started
-      redis:
-        condition: service_healthy
-
-
-
 volumes:
   postgres_data:
+  redis_data:

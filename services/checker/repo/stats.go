@@ -31,7 +31,7 @@ func (r *Stats) CreateStat(ctx context.Context, s *model.Stat) (*model.Stat, err
 	r.log.DebugContext(ctx, "create stat", "site_id", s.SiteID)
 
 	const q = `
-		INSERT INTO stat (site_id, checked_at, is_up, status_code, reponse_time_ms, error)
+		INSERT INTO stat (site_id, checked_at, is_up, status_code, response_time_ms, error)
 		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id
 	`

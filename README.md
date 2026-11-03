@@ -21,43 +21,6 @@ track website health, report incidents, and explore uptime history.
 
 pingtower is a website monitoring service. visitors can view website statuses and incident history. registered users can report incidents.
 
-## components
-
-- [x] **auth** — user registration and login.
-- [x] **sites** — manages monitored websites.
-- [x] **checker** — probes enabled websites and records results and daily statistics.
-- [ ] **frontend** — displays statuses, charts, and incident reports.
-- [ ] **gateway** — provides a single entry point and rate limiting.
-- [ ] **stats** — serves historical statistics and chart data.
-
-## architecture
-
-```text
-                         ┌────────────┐
-                         │  frontend  │
-                         └─────┬──────┘
-                               │
-                         ┌─────▼──────┐
-                         │  gateway   │
-                         └─┬───┬───┬──┘
-                           │   │   │
-             ┌─────────────┘   │   └─────────────┐
-             ▼                 ▼                 ▼
-        ┌─────────┐      ┌──────────┐       ┌─────────┐
-        │  auth   │      │  sites   │       │  stats  │
-        └─────────┘      └────┬─────┘       └────▲────┘
-                              ▼                  │
-                         ┌─────────┐             │
-                         │ checker ├─────────────┘
-                         └────┬────┘
-                              │
-                    ┌─────────┴─────────┐
-                    ▼                   ▼
-              ┌──────────┐        ┌─────────┐
-              │postgresql│        │  redis  │
-              └──────────┘        └─────────┘
-```
-
 ## tech stack
 
 - **languages:** go + sql + html + css + typescript
@@ -69,56 +32,10 @@ pingtower is a website monitoring service. visitors can view website statuses an
 - **infrastructure:** docker + docker compose
 - **testing and ci:** go test + github actions
 
-## project structure
+## components
 
-```text
-pingtower/
-├── services/
-│   ├── auth/
-│   │   ├── migrations/
-│   │   ├── Dockerfile
-│   │   ├── handler/
-│   │   ├── middleware/
-│   │   ├── model/
-│   │   ├── repo/
-│   │   ├── service/
-│   │   ├── token/
-│   │   ├── .env
-│   │   ├── .env.example
-│   │   └── main.go
-│   ├── checker/
-│   │   ├── migrations/
-│   │   ├── Dockerfile
-│   │   ├── model/
-│   │   ├── repo/
-│   │   ├── checker/
-│   │   ├── cache/
-│   │   └── main.go
-│   ├── gateway/
-│   │   ├── Dockerfile
-│   │   └── ...
-│   ├── sites/
-│   │   ├── migrations/
-│   │   ├── Dockerfile
-│   │   ├── handler/
-│   │   ├── model/
-│   │   ├── repo/
-│   │   ├── service/
-│   │   ├── .env
-│   │   ├── .env.example
-│   │   └── main.go
-│   └── stats/
-│       ├── Dockerfile
-│       └── ...
-├── frontend/
-│   ├── Dockerfile
-│   └── ...
-├── .github/
-│   └── workflows/
-│       └── tests.yml
-├── docker-compose.yaml
-├── .env.example
-├── go.mod
-├── go.sum
-└── README.md
-```
+- [x] **sites** — manages monitored websites.
+- [x] **checker** — probes enabled websites and records results and daily statistics.
+- [ ] **frontend** — displays statuses, charts, and incident reports.
+- [ ] **gateway** — provides a single entry point and rate limiting.
+- [ ] **stats** — serves historical statistics and chart data.
