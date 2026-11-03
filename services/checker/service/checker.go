@@ -12,16 +12,23 @@ import (
 	"golang.org/x/time/rate"
 
 	"github.com/mbrysin/PingTower/services/checker/model"
-	"github.com/mbrysin/PingTower/services/checker/repo"
 )
+
+type siteSource interface {
+	GetEnabled(ctx context.Context) ([]model.Site, error)
+}
+
+type statWriter interface {
+	CreateStat(ctx context.Context, stat *model.Stat) (*model.Stat, error)
+}
 
 type statCache interface {
 	Add(ctx context.Context, stat *model.Stat) error
 }
 
 type Checker struct {
-	sites    *repo.Sites
-	stats    *repo.Stats
+	sites    siteSource
+	stats    statWriter
 	cache    statCache
 	client   *http.Client
 	limiter  *rate.Limiter
@@ -31,8 +38,8 @@ type Checker struct {
 }
 
 func New(
-	sites *repo.Sites,
-	stats *repo.Stats,
+	sites siteSource,
+	stats statWriter,
 	cache statCache,
 	log *slog.Logger,
 	interval time.Duration,
