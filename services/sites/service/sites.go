@@ -9,6 +9,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/mbrysin/PingTower/services/sites/model"
+	"github.com/mbrysin/PingTower/services/sites/repo"
 )
 
 const (
@@ -17,6 +18,7 @@ const (
 )
 
 var ErrInvalidSite = errors.New("invalid site")
+var ErrSiteNotFound = errors.New("site not found")
 
 type SiteRepository interface {
 	Create(ctx context.Context, site *model.Site) (*model.Site, error)
@@ -63,7 +65,16 @@ func (s *SiteService) Get(ctx context.Context, id int) (*model.Site, error) {
 	if id <= 0 {
 		return nil, ErrInvalidSite
 	}
-	return s.sites.Get(ctx, id)
+
+	site, err := s.sites.Get(ctx, id)
+	if errors.Is(err, repo.ErrSiteNotFound) {
+		return nil, ErrSiteNotFound
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return site, nil
 }
 
 func (s *SiteService) List(ctx context.Context, limit, offset int) ([]model.Site, error) {

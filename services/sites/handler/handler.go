@@ -35,7 +35,7 @@ func (h *Handler) Get(c *gin.Context) {
 
 	site, err := h.sites.Get(c.Request.Context(), id)
 	if err != nil {
-		if errors.Is(err, service.ErrInvalidSite) {
+		if errors.Is(err, service.ErrSiteNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "site not found"})
 			return
 		}
