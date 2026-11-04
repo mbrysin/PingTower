@@ -21,12 +21,12 @@ var ErrInvalidSite = errors.New("invalid site")
 var ErrSiteNotFound = errors.New("site not found")
 
 type SiteRepository interface {
-	Create(ctx context.Context, site *model.Site) (*model.Site, error)
-	Get(ctx context.Context, id int) (*model.Site, error)
-	List(ctx context.Context, limit, offset int) ([]model.Site, error)
-	UpdateName(ctx context.Context, id int, name string) (*model.Site, error)
-	SetEnabled(ctx context.Context, id int, enabled bool) (*model.Site, error)
-	Delete(ctx context.Context, id int) error
+	CreateSite(ctx context.Context, site *model.Site) (*model.Site, error)
+	GetSite(ctx context.Context, id int) (*model.Site, error)
+	SitesList(ctx context.Context, limit, offset int) ([]model.Site, error)
+	UpdateSiteName(ctx context.Context, id int, name string) (*model.Site, error)
+	SetSiteEnabled(ctx context.Context, id int, enabled bool) (*model.Site, error)
+	DeleteSite(ctx context.Context, id int) error
 }
 
 type SiteService struct {
@@ -46,7 +46,7 @@ func (s *SiteService) Create(ctx context.Context, name string, rawURL string) (*
 		return nil, ErrInvalidSite
 	}
 
-	return s.sites.Create(ctx, &model.Site{
+	return s.sites.CreateSite(ctx, &model.Site{
 		Name: name,
 		URL:  rawURL,
 	})
@@ -66,7 +66,7 @@ func (s *SiteService) Get(ctx context.Context, id int) (*model.Site, error) {
 		return nil, ErrInvalidSite
 	}
 
-	site, err := s.sites.Get(ctx, id)
+	site, err := s.sites.GetSite(ctx, id)
 	if errors.Is(err, repo.ErrSiteNotFound) {
 		return nil, ErrSiteNotFound
 	}
@@ -84,7 +84,7 @@ func (s *SiteService) List(ctx context.Context, limit, offset int) ([]model.Site
 	if offset < 0 {
 		return nil, fmt.Errorf("list sites: offset must not be negative")
 	}
-	return s.sites.List(ctx, limit, offset)
+	return s.sites.SitesList(ctx, limit, offset)
 }
 
 func (s *SiteService) UpdateName(ctx context.Context, id int, name string) (*model.Site, error) {
@@ -93,7 +93,7 @@ func (s *SiteService) UpdateName(ctx context.Context, id int, name string) (*mod
 		return nil, ErrInvalidSite
 	}
 
-	return s.sites.UpdateName(ctx, id, name)
+	return s.sites.UpdateSiteName(ctx, id, name)
 }
 
 func (s *SiteService) SetEnabled(ctx context.Context, id int, enabled bool) (*model.Site, error) {
@@ -101,7 +101,7 @@ func (s *SiteService) SetEnabled(ctx context.Context, id int, enabled bool) (*mo
 		return nil, ErrInvalidSite
 	}
 
-	return s.sites.SetEnabled(ctx, id, enabled)
+	return s.sites.SetSiteEnabled(ctx, id, enabled)
 }
 
 func (s *SiteService) Delete(ctx context.Context, id int) error {
@@ -109,5 +109,5 @@ func (s *SiteService) Delete(ctx context.Context, id int) error {
 		return ErrInvalidSite
 	}
 
-	return s.sites.Delete(ctx, id)
+	return s.sites.DeleteSite(ctx, id)
 }

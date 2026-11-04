@@ -9,60 +9,60 @@ import (
 )
 
 type fakeSiteRepository struct {
-	createFn     func(context.Context, *model.Site) (*model.Site, error)
-	getFn        func(context.Context, int) (*model.Site, error)
-	listFn       func(context.Context, int, int) ([]model.Site, error)
-	updateNameFn func(context.Context, int, string) (*model.Site, error)
-	setEnabledFn func(context.Context, int, bool) (*model.Site, error)
-	deleteFn     func(context.Context, int) error
+	createSiteFn     func(context.Context, *model.Site) (*model.Site, error)
+	getSiteFn        func(context.Context, int) (*model.Site, error)
+	sitesListFn      func(context.Context, int, int) ([]model.Site, error)
+	updateSiteNameFn func(context.Context, int, string) (*model.Site, error)
+	setSiteEnabledFn func(context.Context, int, bool) (*model.Site, error)
+	deleteSiteFn     func(context.Context, int) error
 }
 
-func (f *fakeSiteRepository) Create(ctx context.Context, site *model.Site) (*model.Site, error) {
-	if f.createFn != nil {
-		return f.createFn(ctx, site)
+func (f *fakeSiteRepository) CreateSite(ctx context.Context, site *model.Site) (*model.Site, error) {
+	if f.createSiteFn != nil {
+		return f.createSiteFn(ctx, site)
 	}
 	return site, nil
 }
 
-func (f *fakeSiteRepository) Get(ctx context.Context, id int) (*model.Site, error) {
-	if f.getFn != nil {
-		return f.getFn(ctx, id)
+func (f *fakeSiteRepository) GetSite(ctx context.Context, id int) (*model.Site, error) {
+	if f.getSiteFn != nil {
+		return f.getSiteFn(ctx, id)
 	}
 	return &model.Site{ID: id}, nil
 }
 
-func (f *fakeSiteRepository) List(ctx context.Context, limit, offset int) ([]model.Site, error) {
-	if f.listFn != nil {
-		return f.listFn(ctx, limit, offset)
+func (f *fakeSiteRepository) SitesList(ctx context.Context, limit, offset int) ([]model.Site, error) {
+	if f.sitesListFn != nil {
+		return f.sitesListFn(ctx, limit, offset)
 	}
 	return nil, nil
 }
 
-func (f *fakeSiteRepository) UpdateName(
+func (f *fakeSiteRepository) UpdateSiteName(
 	ctx context.Context,
 	id int,
 	name string,
 ) (*model.Site, error) {
-	if f.updateNameFn != nil {
-		return f.updateNameFn(ctx, id, name)
+	if f.updateSiteNameFn != nil {
+		return f.updateSiteNameFn(ctx, id, name)
 	}
 	return &model.Site{ID: id, Name: name}, nil
 }
 
-func (f *fakeSiteRepository) SetEnabled(
+func (f *fakeSiteRepository) SetSiteEnabled(
 	ctx context.Context,
 	id int,
 	enabled bool,
 ) (*model.Site, error) {
-	if f.setEnabledFn != nil {
-		return f.setEnabledFn(ctx, id, enabled)
+	if f.setSiteEnabledFn != nil {
+		return f.setSiteEnabledFn(ctx, id, enabled)
 	}
 	return &model.Site{ID: id, Enabled: enabled}, nil
 }
 
-func (f *fakeSiteRepository) Delete(ctx context.Context, id int) error {
-	if f.deleteFn != nil {
-		return f.deleteFn(ctx, id)
+func (f *fakeSiteRepository) DeleteSite(ctx context.Context, id int) error {
+	if f.deleteSiteFn != nil {
+		return f.deleteSiteFn(ctx, id)
 	}
 	return nil
 }
@@ -113,7 +113,7 @@ func TestSiteService_Create(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var got *model.Site
 			repo := &fakeSiteRepository{
-				createFn: func(_ context.Context, site *model.Site) (*model.Site, error) {
+				createSiteFn: func(_ context.Context, site *model.Site) (*model.Site, error) {
 					got = site
 					return site, nil
 				},
@@ -150,7 +150,7 @@ func TestSiteService_Create(t *testing.T) {
 func TestSiteService_Create_RepositoryError(t *testing.T) {
 	repoErr := errors.New("database error")
 	service := NewSiteService(&fakeSiteRepository{
-		createFn: func(context.Context, *model.Site) (*model.Site, error) {
+		createSiteFn: func(context.Context, *model.Site) (*model.Site, error) {
 			return nil, repoErr
 		},
 	})
@@ -167,7 +167,7 @@ func TestSiteService_Get(t *testing.T) {
 		var gotID int
 
 		service := NewSiteService(&fakeSiteRepository{
-			getFn: func(_ context.Context, id int) (*model.Site, error) {
+			getSiteFn: func(_ context.Context, id int) (*model.Site, error) {
 				gotID = id
 				return &model.Site{ID: id}, nil
 			},
@@ -186,7 +186,7 @@ func TestSiteService_Get(t *testing.T) {
 		t.Run("invalid id", func(t *testing.T) {
 			called := false
 			service := NewSiteService(&fakeSiteRepository{
-				getFn: func(context.Context, int) (*model.Site, error) {
+				getSiteFn: func(context.Context, int) (*model.Site, error) {
 					called = true
 					return nil, nil
 				},
@@ -208,7 +208,7 @@ func TestSiteService_List(t *testing.T) {
 	wantSites := []model.Site{{ID: 1, Name: "Example"}}
 
 	service := NewSiteService(&fakeSiteRepository{
-		listFn: func(_ context.Context, limit, offset int) ([]model.Site, error) {
+		sitesListFn: func(_ context.Context, limit, offset int) ([]model.Site, error) {
 			gotLimit, gotOffset = limit, offset
 			return wantSites, nil
 		},
@@ -232,7 +232,7 @@ func TestSiteService_UpdateName(t *testing.T) {
 		var gotName string
 
 		service := NewSiteService(&fakeSiteRepository{
-			updateNameFn: func(_ context.Context, id int, name string) (*model.Site, error) {
+			updateSiteNameFn: func(_ context.Context, id int, name string) (*model.Site, error) {
 				gotID, gotName = id, name
 				return &model.Site{ID: id, Name: name}, nil
 			},
@@ -264,7 +264,7 @@ func TestSiteService_UpdateName(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			called := false
 			service := NewSiteService(&fakeSiteRepository{
-				updateNameFn: func(context.Context, int, string) (*model.Site, error) {
+				updateSiteNameFn: func(context.Context, int, string) (*model.Site, error) {
 					called = true
 					return nil, nil
 				},
@@ -286,7 +286,7 @@ func TestSiteService_SetEnabled(t *testing.T) {
 	var gotEnabled bool
 
 	service := NewSiteService(&fakeSiteRepository{
-		setEnabledFn: func(_ context.Context, id int, enabled bool) (*model.Site, error) {
+		setSiteEnabledFn: func(_ context.Context, id int, enabled bool) (*model.Site, error) {
 			gotID, gotEnabled = id, enabled
 			return &model.Site{ID: id, Enabled: enabled}, nil
 		},
@@ -307,7 +307,7 @@ func TestSiteService_SetEnabled(t *testing.T) {
 func TestSiteService_SetEnabled_InvalidID(t *testing.T) {
 	called := false
 	service := NewSiteService(&fakeSiteRepository{
-		setEnabledFn: func(context.Context, int, bool) (*model.Site, error) {
+		setSiteEnabledFn: func(context.Context, int, bool) (*model.Site, error) {
 			called = true
 			return nil, nil
 		},
@@ -325,7 +325,7 @@ func TestSiteService_SetEnabled_InvalidID(t *testing.T) {
 func TestSiteService_Delete(t *testing.T) {
 	var gotID int
 	service := NewSiteService(&fakeSiteRepository{
-		deleteFn: func(_ context.Context, id int) error {
+		deleteSiteFn: func(_ context.Context, id int) error {
 			gotID = id
 			return nil
 		},
@@ -342,7 +342,7 @@ func TestSiteService_Delete(t *testing.T) {
 func TestSiteService_Delete_InvalidID(t *testing.T) {
 	called := false
 	service := NewSiteService(&fakeSiteRepository{
-		deleteFn: func(context.Context, int) error {
+		deleteSiteFn: func(context.Context, int) error {
 			called = true
 			return nil
 		},
