@@ -73,7 +73,7 @@ func TestSites_Create(t *testing.T) {
 		URL:  "https://example.com",
 	}
 
-	created, err := repo.Create(ctx, site)
+	created, err := repo.CreateSite(ctx, site)
 	if err != nil {
 		t.Fatalf("Create() error = %v", err)
 	}
@@ -99,12 +99,12 @@ func TestSites_Create_DuplicateURL(t *testing.T) {
 	ctx := context.Background()
 
 	first := &model.Site{Name: "First", URL: "https://example.com"}
-	if _, err := repo.Create(ctx, first); err != nil {
+	if _, err := repo.CreateSite(ctx, first); err != nil {
 		t.Fatalf("первый Create() error = %v", err)
 	}
 
 	second := &model.Site{Name: "Second", URL: "https://example.com"}
-	_, err := repo.Create(ctx, second)
+	_, err := repo.CreateSite(ctx, second)
 	if !errors.Is(err, ErrSiteExists) {
 		t.Errorf("повторный Create() error = %v, want ErrSiteExists", err)
 	}
@@ -115,7 +115,7 @@ func TestSites_Get(t *testing.T) {
 	defer cleanup()
 
 	ctx := context.Background()
-	created, err := repo.Create(ctx, &model.Site{
+	created, err := repo.CreateSite(ctx, &model.Site{
 		Name: "Example",
 		URL:  "https://example.com",
 	})
@@ -123,7 +123,7 @@ func TestSites_Get(t *testing.T) {
 		t.Fatalf("Create() error = %v", err)
 	}
 
-	got, err := repo.Get(ctx, created.ID)
+	got, err := repo.GetSite(ctx, created.ID)
 	if err != nil {
 		t.Fatalf("Get() error = %v", err)
 	}
@@ -146,7 +146,7 @@ func TestSites_Get_NotFound(t *testing.T) {
 	repo, cleanup := setupSitesTest(t)
 	defer cleanup()
 
-	_, err := repo.Get(context.Background(), 999999)
+	_, err := repo.GetSite(context.Background(), 999999)
 	if !errors.Is(err, ErrSiteNotFound) {
 		t.Errorf("Get() error = %v, want ErrSiteNotFound", err)
 	}
@@ -158,7 +158,7 @@ func TestSites_List(t *testing.T) {
 
 	ctx := context.Background()
 
-	first, err := repo.Create(ctx, &model.Site{
+	first, err := repo.CreateSite(ctx, &model.Site{
 		Name: "First",
 		URL:  "https://first.example",
 	})
@@ -166,7 +166,7 @@ func TestSites_List(t *testing.T) {
 		t.Fatalf("Create(first) error = %v", err)
 	}
 
-	second, err := repo.Create(ctx, &model.Site{
+	second, err := repo.CreateSite(ctx, &model.Site{
 		Name: "Second",
 		URL:  "https://second.example",
 	})
@@ -174,7 +174,7 @@ func TestSites_List(t *testing.T) {
 		t.Fatalf("Create(second) error = %v", err)
 	}
 
-	sites, err := repo.List(ctx, 10, 0)
+	sites, err := repo.SitesList(ctx, 10, 0)
 	if err != nil {
 		t.Fatalf("List() error = %v", err)
 	}
@@ -204,12 +204,12 @@ func TestSites_List_Pagination(t *testing.T) {
 		{Name: "Second", URL: "https://second.example"},
 		{Name: "Third", URL: "https://third.example"},
 	} {
-		if _, err := repo.Create(ctx, &site); err != nil {
+		if _, err := repo.CreateSite(ctx, &site); err != nil {
 			t.Fatalf("Create(%d) error = %v", i, err)
 		}
 	}
 
-	sites, err := repo.List(ctx, 1, 1)
+	sites, err := repo.SitesList(ctx, 1, 1)
 	if err != nil {
 		t.Fatalf("List() error = %v", err)
 	}
@@ -226,7 +226,7 @@ func TestSites_List_Empty(t *testing.T) {
 	repo, cleanup := setupSitesTest(t)
 	defer cleanup()
 
-	sites, err := repo.List(context.Background(), 10, 0)
+	sites, err := repo.SitesList(context.Background(), 10, 0)
 	if err != nil {
 		t.Fatalf("List() error = %v", err)
 	}
@@ -251,7 +251,7 @@ func TestSites_List_InvalidPagination(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := repo.List(context.Background(), tt.limit, tt.offset)
+			_, err := repo.SitesList(context.Background(), tt.limit, tt.offset)
 			if err == nil {
 				t.Fatal("List() ожидалась ошибка для некорректной пагинации")
 			}
@@ -264,7 +264,7 @@ func TestSites_UpdateName(t *testing.T) {
 	defer cleanup()
 
 	ctx := context.Background()
-	created, err := repo.Create(ctx, &model.Site{
+	created, err := repo.CreateSite(ctx, &model.Site{
 		Name: "Old name",
 		URL:  "https://example.com",
 	})
@@ -272,7 +272,7 @@ func TestSites_UpdateName(t *testing.T) {
 		t.Fatalf("Create() error = %v", err)
 	}
 
-	updated, err := repo.UpdateName(ctx, created.ID, "New name")
+	updated, err := repo.UpdateSiteName(ctx, created.ID, "New name")
 	if err != nil {
 		t.Fatalf("UpdateName() error = %v", err)
 	}
@@ -292,7 +292,7 @@ func TestSites_UpdateName_NotFound(t *testing.T) {
 	repo, cleanup := setupSitesTest(t)
 	defer cleanup()
 
-	_, err := repo.UpdateName(context.Background(), 999999, "New name")
+	_, err := repo.UpdateSiteName(context.Background(), 999999, "New name")
 	if !errors.Is(err, ErrSiteNotFound) {
 		t.Errorf("UpdateName() error = %v, want ErrSiteNotFound", err)
 	}
@@ -303,7 +303,7 @@ func TestSites_SetEnabled(t *testing.T) {
 	defer cleanup()
 
 	ctx := context.Background()
-	created, err := repo.Create(ctx, &model.Site{
+	created, err := repo.CreateSite(ctx, &model.Site{
 		Name: "Example",
 		URL:  "https://example.com",
 	})
@@ -314,7 +314,7 @@ func TestSites_SetEnabled(t *testing.T) {
 		t.Fatal("новый сайт должен быть выключен")
 	}
 
-	enabled, err := repo.SetEnabled(ctx, created.ID, true)
+	enabled, err := repo.SetSiteEnabled(ctx, created.ID, true)
 	if err != nil {
 		t.Fatalf("SetEnabled(true) error = %v", err)
 	}
@@ -322,7 +322,7 @@ func TestSites_SetEnabled(t *testing.T) {
 		t.Error("SetEnabled(true) не включил мониторинг")
 	}
 
-	disabled, err := repo.SetEnabled(ctx, created.ID, false)
+	disabled, err := repo.SetSiteEnabled(ctx, created.ID, false)
 	if err != nil {
 		t.Fatalf("SetEnabled(false) error = %v", err)
 	}
@@ -335,7 +335,7 @@ func TestSites_SetEnabled_NotFound(t *testing.T) {
 	repo, cleanup := setupSitesTest(t)
 	defer cleanup()
 
-	_, err := repo.SetEnabled(context.Background(), 999999, true)
+	_, err := repo.SetSiteEnabled(context.Background(), 999999, true)
 	if !errors.Is(err, ErrSiteNotFound) {
 		t.Errorf("SetEnabled() error = %v, want ErrSiteNotFound", err)
 	}
@@ -346,7 +346,7 @@ func TestSites_Delete(t *testing.T) {
 	defer cleanup()
 
 	ctx := context.Background()
-	created, err := repo.Create(ctx, &model.Site{
+	created, err := repo.CreateSite(ctx, &model.Site{
 		Name: "Example",
 		URL:  "https://example.com",
 	})
@@ -354,11 +354,11 @@ func TestSites_Delete(t *testing.T) {
 		t.Fatalf("Create() error = %v", err)
 	}
 
-	if err := repo.Delete(ctx, created.ID); err != nil {
+	if err := repo.DeleteSite(ctx, created.ID); err != nil {
 		t.Fatalf("Delete() error = %v", err)
 	}
 
-	_, err = repo.Get(ctx, created.ID)
+	_, err = repo.GetSite(ctx, created.ID)
 	if !errors.Is(err, ErrSiteNotFound) {
 		t.Errorf("Get() после Delete() error = %v, want ErrSiteNotFound", err)
 	}
@@ -368,7 +368,7 @@ func TestSites_Delete_NotFound(t *testing.T) {
 	repo, cleanup := setupSitesTest(t)
 	defer cleanup()
 
-	err := repo.Delete(context.Background(), 999999)
+	err := repo.DeleteSite(context.Background(), 999999)
 	if !errors.Is(err, ErrSiteNotFound) {
 		t.Errorf("Delete() error = %v, want ErrSiteNotFound", err)
 	}
