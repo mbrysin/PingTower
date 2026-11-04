@@ -30,7 +30,7 @@ func NewSites(db *pgxpool.Pool, log *slog.Logger) *Sites {
 	}
 }
 
-func (r *Sites) Create(ctx context.Context, s *model.Site) (*model.Site, error) {
+func (r *Sites) CreateSite(ctx context.Context, s *model.Site) (*model.Site, error) {
 	r.log.DebugContext(ctx, "create site", "url", s.URL)
 
 	const q = `
@@ -59,7 +59,7 @@ func (r *Sites) Create(ctx context.Context, s *model.Site) (*model.Site, error) 
 	return s, nil
 }
 
-func (r *Sites) Get(ctx context.Context, id int) (*model.Site, error) {
+func (r *Sites) GetSite(ctx context.Context, id int) (*model.Site, error) {
 	r.log.DebugContext(ctx, "get site", "id", id)
 
 	const q = `
@@ -88,7 +88,7 @@ func (r *Sites) Get(ctx context.Context, id int) (*model.Site, error) {
 	return &s, nil
 }
 
-func (r *Sites) List(
+func (r *Sites) SitesList(
 	ctx context.Context,
 	limit int,
 	offset int,
@@ -140,7 +140,7 @@ func (r *Sites) List(
 	return sites, nil
 }
 
-func (r *Sites) UpdateName(ctx context.Context, id int, name string) (*model.Site, error) {
+func (r *Sites) UpdateSiteName(ctx context.Context, id int, name string) (*model.Site, error) {
 	r.log.DebugContext(ctx, "update name", "id", id, "name", name)
 
 	const q = `
@@ -174,7 +174,7 @@ func (r *Sites) UpdateName(ctx context.Context, id int, name string) (*model.Sit
 	return &s, nil
 }
 
-func (r *Sites) SetEnabled(ctx context.Context, id int, enabled bool) (*model.Site, error) {
+func (r *Sites) SetSiteEnabled(ctx context.Context, id int, enabled bool) (*model.Site, error) {
 	r.log.DebugContext(ctx, "set site enabled", "id", id, "enabled", enabled)
 
 	const q = `
@@ -207,7 +207,7 @@ func (r *Sites) SetEnabled(ctx context.Context, id int, enabled bool) (*model.Si
 	return &s, nil
 }
 
-func (r *Sites) Delete(ctx context.Context, id int) error {
+func (r *Sites) DeleteSite(ctx context.Context, id int) error {
 	r.log.DebugContext(ctx, "delete site", "id", id)
 
 	const q = `DELETE FROM sites WHERE id = $1`
