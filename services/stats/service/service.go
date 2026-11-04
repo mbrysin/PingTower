@@ -1,0 +1,95 @@
+package service
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/mbrysin/PingTower/services/stats/model"
+)
+
+type StatsRepository interface {
+	GetStatsBetween(
+		ctx context.Context,
+		siteID int,
+		from time.Time,
+		to time.Time,
+	) ([]model.Stat, error)
+
+	GetDailyStatsBetween(
+		ctx context.Context,
+		siteID int,
+		from time.Time,
+		to time.Time,
+	) ([]model.DailyStat, error)
+}
+
+type RedisStatsRepository interface {
+	GetBetween(
+		ctx context.Context,
+		siteID int,
+		from time.Time,
+		to time.Time,
+	) ([]model.Stat, error)
+}
+
+type Stats struct {
+	repo      StatsRepository
+	redisRepo RedisStatsRepository
+}
+
+func NewStats(repo StatsRepository, redisRepo RedisStatsRepository) *Stats {
+	return &Stats{
+		repo:      repo,
+		redisRepo: redisRepo,
+	}
+}
+
+func (s *Stats) GetStatsBetween(
+	ctx context.Context,
+	siteID int,
+	from time.Time,
+	to time.Time,
+) ([]model.Stat, error) {
+	if siteID <= 0 {
+		return nil, fmt.Errorf("site_id must be positive")
+	}
+	if !from.Before(to) {
+		return nil, fmt.Errorf("from must be before to")
+	}
+
+	stats, err := s.redisRepo.GetBetween(ctx, siteID, from, to)
+	if err != nil {
+		return nil, fmt.Errorf("get stats from redis: %w", err)
+	}
+	if len(stats) > 0 {
+		return stats, nil
+	}
+
+	return s.repo.GetStatsBetween(ctx, siteID, from, to)
+}
+
+func (s *Stats) GetDailyStatsBetween(
+	ctx context.Context,
+	siteID int,
+	from time.Time,
+	to time.Time,
+) ([]model.DailyStat, error) {
+	if siteID <= 0 {
+		return nil, fmt.Errorf("site_id must be positive")
+	}
+
+	from = dateOnly(from)
+	to = dateOnly(to)
+
+	if !from.Before(to) {
+		return nil, fmt.Errorf("from must be before to")
+	}
+
+	return s.repo.GetDailyStatsBetween(ctx, siteID, from, to)
+}
+
+func dateOnly(t time.Time) time.Time {
+	y, m, d := t.Date()
+	return time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
+}

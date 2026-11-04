@@ -50,6 +50,7 @@ services:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - sites
+      - stats
     restart: unless-stopped
 
   sites:
@@ -78,6 +79,24 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+
+  stats:
+    build:
+      context: .
+      dockerfile: services/stats/Dockerfile
+    environment:
+      DATABASE_URL: postgres://test:test@postgres:5432/app_db?sslmode=disable
+      REDIS_ADDR: redis:6379
+      REDIS_DB: "0"
+      STATS_ADDR: ":8082"
+    expose:
+      - "8082"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
 
 volumes:
   postgres_data:
