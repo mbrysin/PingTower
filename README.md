@@ -15,11 +15,11 @@ track website health, report incidents, and explore uptime history.
 </div>
 
 > [!NOTE]
-> PingTower is a learning project under active development. some components and features are planned and may not be implemented yet.
+> this project is under active development. some components and features are planned and may not be implemented yet.
 
 ## about
 
-PingTower is a website monitoring service. visitors can view website statuses and incident history. registered users can report incidents.
+pingtower is a website monitoring service. visitors can view website statuses and incident history. registered users can report incidents.
 
 ## tech stack
 
@@ -29,25 +29,12 @@ PingTower is a website monitoring service. visitors can view website statuses an
 - **cache and rate limiting:** redis
 - **security:** bcrypt
 - **infrastructure:** docker + docker compose
-- **testing and ci:** go tests + github actions
-
-## api
-
-| method | endpoint | description |
-| --- | --- | --- |
-| `get` | `/sites` | list sites |
-| `get` | `/sites/:id` | get a site by ID |
+- **testing and ci:** go test + github actions
 
 ## components
 
-- [x] **sites** — provides api endpoints for listing and retrieving sites.
-- [x] **checker** — probes enabled websites, records results, and stores statistics in the database.
+- [x] **sites** — manages monitored websites.
+- [x] **checker** — probes enabled websites and records results and daily statistics.
 - [x] **nginx** — reverse proxy and entry point for the services.
+- [x] **stats** — serves historical statistics and chart data.
 - [ ] **frontend** — displays statuses, charts, and incident reports.
-- [ ] **stats** — serves historical statistics and chart data.
-
-## run locally
-
-start the project with docker compose:
-```bash
-docker compose up --build
