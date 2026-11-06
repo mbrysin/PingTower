@@ -1,7 +1,6 @@
 <div align="center">
 
 <h1>PingTower</h1>
-
 **website uptime monitoring, built with go**
 
 ---
