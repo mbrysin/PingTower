@@ -4,7 +4,7 @@
   <defs>
     <style>
       .st0 {
-        fill: #f8f8f8;
+        fill: #f9f9f9;
         font-family: Arial-BoldMT, Arial;
         font-size: 272px;
         font-weight: 700;
@@ -31,7 +31,7 @@
       }
 
       .st7 {
-        fill: #14171b;
+        fill: #000000;
       }
 
       .st4 {

@@ -22,6 +22,8 @@ type StatsRepository interface {
 		from time.Time,
 		to time.Time,
 	) ([]model.DailyStat, error)
+
+	GetLatest(ctx context.Context, siteID int) (*model.Stat, error)
 }
 
 type RedisStatsRepository interface {
@@ -92,4 +94,20 @@ func (s *Stats) GetDailyStatsBetween(
 func dateOnly(t time.Time) time.Time {
 	y, m, d := t.Date()
 	return time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
+}
+
+func (s *Stats) GetLatest(
+	ctx context.Context,
+	siteID int,
+) (*model.Stat, error) {
+	if siteID <= 0 {
+		return nil, fmt.Errorf("site_id must be positive")
+	}
+
+	stat, err := s.repo.GetLatest(ctx, siteID)
+	if err != nil {
+		return nil, fmt.Errorf("get latest stat: %w", err)
+	}
+
+	return stat, nil
 }

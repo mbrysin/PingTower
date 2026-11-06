@@ -49,6 +49,7 @@ services:
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
+      - frontend
       - sites
       - stats
     restart: unless-stopped
@@ -96,6 +97,18 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: services/frontend/Dockerfile
+    environment:
+      ADDR: ":8083"
+      GIN_MODE: release
+    expose:
+      - "8083"
+    restart: unless-stopped
+
 
 
 volumes:
