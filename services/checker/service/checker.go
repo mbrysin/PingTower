@@ -6,6 +6,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"net/http/cookiejar"
 	"sync"
 	"time"
 
@@ -52,11 +53,16 @@ func New(
 		return nil, fmt.Errorf("workers must be at least 1")
 	}
 
+	jar, err := cookiejar.New(nil)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Checker{
 		sites:    sites,
 		stats:    stats,
 		cache:    cache,
-		client:   &http.Client{Timeout: 10 * time.Second},
+		client:   &http.Client{Jar: jar, Timeout: 15 * time.Second},
 		limiter:  rate.NewLimiter(rate.Limit(2), 1),
 		log:      log.With("service", "checker"),
 		interval: interval,

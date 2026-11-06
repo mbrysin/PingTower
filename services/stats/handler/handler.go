@@ -24,6 +24,11 @@ type StatsService interface {
 		from time.Time,
 		to time.Time,
 	) ([]model.DailyStat, error)
+
+	GetLatest(
+		ctx context.Context,
+		siteID int,
+	) (*model.Stat, error)
 }
 
 type Handler struct {
@@ -129,4 +134,19 @@ func writeJSON(w http.ResponseWriter, status int, value any) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(value)
+}
+
+func (h *Handler) GetLatest(w http.ResponseWriter, r *http.Request) {
+	siteID, ok := parseSiteID(w, r)
+	if !ok {
+		return
+	}
+
+	stat, err := h.service.GetLatest(r.Context(), siteID)
+	if err != nil {
+		http.Error(w, "failed to get latest stat", http.StatusInternalServerError)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, stat)
 }

@@ -63,6 +63,8 @@ func (r *Stats) GetStatsByHour(
 	siteID int,
 	at time.Time,
 ) ([]model.Stat, error) {
+	r.log.With("repo", "get_stats_by_hour", "siteID", siteID)
+
 	start := at.Truncate(time.Hour)
 	end := start.Add(time.Hour)
 
@@ -114,6 +116,7 @@ func (r *Stats) GetStatsBetween(
 	from time.Time,
 	to time.Time,
 ) ([]model.Stat, error) {
+	r.log.With("repo", "get_stats_between", "siteID", siteID)
 	if !from.Before(to) {
 		return nil, fmt.Errorf("invalid time range: from must be before to")
 	}
@@ -158,4 +161,38 @@ func (r *Stats) GetStatsBetween(
 	}
 
 	return stats, nil
+}
+
+func (r *Stats) GetLatest(
+	ctx context.Context,
+	siteID int,
+) (*model.Stat, error) {
+	const query = `
+		SELECT id, site_id, checked_at, is_up, status_code,
+		       response_time_ms, error
+		FROM stat
+		WHERE site_id = $1
+		ORDER BY checked_at DESC, id DESC
+		LIMIT 1
+	`
+
+	var stat model.Stat
+	err := r.db.QueryRow(ctx, query, siteID).Scan(
+		&stat.ID,
+		&stat.SiteID,
+		&stat.CheckedAt,
+		&stat.IsUp,
+		&stat.StatusCode,
+		&stat.ResponseTimeMs,
+		&stat.Error,
+	)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("query latest stat for site %d: %w", siteID, err)
+	}
+
+	return &stat, nil
 }
