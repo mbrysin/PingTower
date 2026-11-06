@@ -37,19 +37,23 @@ func (r *DailyStats) AggregateDay(ctx context.Context, day time.Time) error {
 			max_response_time_ms
 		)
 		SELECT
-			site_id,
+			s.id,
 			$1::date,
-			COUNT(*),
-			COUNT(*) FILTER (WHERE NOT is_up),
-			100.0 * COUNT(*) FILTER (WHERE is_up) / NULLIF(COUNT(*), 0),
-			MAX(checked_at),
-			AVG(response_time_ms),
-			MIN(response_time_ms),
-			MAX(response_time_ms)
-		FROM stat
-		WHERE checked_at >= $1
-		  AND checked_at < $1 + INTERVAL '1 day'
-		GROUP BY site_id
+			COUNT(st.id),
+			COUNT(st.id) FILTER (WHERE NOT st.is_up),
+			100.0 * COUNT(st.id) FILTER (WHERE st.is_up)
+				/ NULLIF(COUNT(st.id), 0),
+			MAX(st.checked_at),
+			AVG(st.response_time_ms),
+			MIN(st.response_time_ms),
+			MAX(st.response_time_ms)
+		FROM sites s
+		LEFT JOIN stat st
+			ON st.site_id = s.id
+			AND st.checked_at >= $1
+			AND st.checked_at < $1 + INTERVAL '1 day'
+		WHERE s.enabled = true
+		GROUP BY s.id
 		ON CONFLICT (site_id, stat_date) DO UPDATE SET
 			checks = EXCLUDED.checks,
 			failed_checks = EXCLUDED.failed_checks,
