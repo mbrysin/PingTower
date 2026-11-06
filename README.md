@@ -36,4 +36,4 @@ pingtower is a website monitoring service. visitors can view website statuses an
 - [x] **checker** — probes enabled websites and records results and daily statistics.
 - [x] **nginx** — reverse proxy and entry point for the services.
 - [x] **stats** — serves historical statistics and chart data.
-- [ ] **frontend** — displays statuses, charts, and incident reports.
+- [x] **frontend** — displays statuses, charts, and incident reports.
