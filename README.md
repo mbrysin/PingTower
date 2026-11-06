@@ -1,6 +1,6 @@
 <div align="center">
 
-[![PingTowerLogo](/images/PingTowerDarkBg.svg)](https://github.com/mbrysin/PingTower)
+<h1>PingTower</h1>
 
 **website uptime monitoring, built with go**
 
