@@ -97,10 +97,19 @@ async function loadSites(): Promise<void> {
 
       const responseTime = document.createElement("p");
       responseTime.className = "tile__response-time";
-      responseTime.textContent =
-        latestStat?.response_time_ms != null
-          ? `${latestStat.response_time_ms} ms`
-          : "— ms";
+
+      if (latestStat?.response_time_ms != null) {
+        const value = document.createElement("span");
+        value.textContent = String(latestStat.response_time_ms);
+
+        const unit = document.createElement("span");
+        unit.className = "tile__response-unit";
+        unit.textContent = " ms";
+
+        responseTime.append(value, unit);
+      } else {
+        responseTime.textContent = "—";
+      }
 
       const lastCheck = document.createElement("p");
       lastCheck.className = "tile__last-check";

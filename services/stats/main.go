@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -60,6 +61,27 @@ func main() {
 
 	router := gin.Default()
 	statsHandler.RegisterRoutes(router)
+
+	router.GET("/healthz", func(c *gin.Context) {
+		c.Status(http.StatusOK)
+	})
+
+	router.GET("/readyz", func(c *gin.Context) {
+		checkCtx, cancel := context.WithTimeout(c.Request.Context(), 2*time.Second)
+		defer cancel()
+
+		if err := db.Ping(checkCtx); err != nil {
+			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "not ready"})
+			return
+		}
+
+		if err := redisClient.Ping(checkCtx).Err(); err != nil {
+			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "not ready"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"status": "ready"})
+	})
 
 	addr := envOrDefault("STATS_ADDR", ":8082")
 	if err := http.ListenAndServe(addr, router); err != nil {

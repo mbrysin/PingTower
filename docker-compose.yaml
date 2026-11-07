@@ -2,15 +2,15 @@ services:
   postgres:
     image: postgres:16
     environment:
-      POSTGRES_USER: test
-      POSTGRES_PASSWORD: test
-      POSTGRES_DB: app_db
+      POSTGRES_USER: ${POSTGRES_USER:-test}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-test}
+      POSTGRES_DB: ${POSTGRES_DB:-app_db}
     ports:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U test -d app_db"]
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -54,49 +54,97 @@ services:
       - stats
     restart: unless-stopped
 
+  migrate:
+    build:
+      context: .
+      dockerfile: services/migrate/Dockerfile
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-test}:${POSTGRES_PASSWORD:-test}@postgres:5432/${POSTGRES_DB:-app_db}?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command:
+      - sh
+      - -ec
+      - |
+        goose -dir services/sites/migrations -table sites_goose_db_version postgres "$$DATABASE_URL" up
+        goose -dir services/checker/migrations -table checker_goose_db_version postgres "$$DATABASE_URL" up
+    restart: "no"
+
   sites:
     build:
       context: .
       dockerfile: services/sites/Dockerfile
     environment:
-      DATABASE_URL: postgres://test:test@postgres:5432/app_db?sslmode=disable
+      DATABASE_URL: postgres://${POSTGRES_USER:-test}:${POSTGRES_PASSWORD:-test}@postgres:5432/${POSTGRES_DB:-app_db}?sslmode=disable
     expose:
       - "8081"
+    ports:
+      - "127.0.0.1:8081:8081"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8081/readyz"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
     depends_on:
       postgres:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
 
   checker:
     build:
       context: .
       dockerfile: services/checker/Dockerfile
     environment:
-      DATABASE_URL: postgres://test:test@postgres:5432/app_db?sslmode=disable
+      DATABASE_URL: postgres://${POSTGRES_USER:-test}:${POSTGRES_PASSWORD:-test}@postgres:5432/${POSTGRES_DB:-app_db}?sslmode=disable
       REDIS_ADDR: redis:6379
       CHECK_INTERVAL: "1"
       WORKERS: "10"
+      HEALTH_ADDR: ":8084"
+    expose:
+      - "8084"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8084/readyz"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
 
   stats:
     build:
       context: .
       dockerfile: services/stats/Dockerfile
     environment:
-      DATABASE_URL: postgres://test:test@postgres:5432/app_db?sslmode=disable
+      DATABASE_URL: postgres://${POSTGRES_USER:-test}:${POSTGRES_PASSWORD:-test}@postgres:5432/${POSTGRES_DB:-app_db}?sslmode=disable
       REDIS_ADDR: redis:6379
       REDIS_DB: "0"
       STATS_ADDR: ":8082"
     expose:
       - "8082"
+    ports:
+      - "127.0.0.1:8082:8082"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8082/readyz"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
 
   frontend:
     build:
@@ -108,8 +156,6 @@ services:
     expose:
       - "8083"
     restart: unless-stopped
-
-
 
 volumes:
   postgres_data:

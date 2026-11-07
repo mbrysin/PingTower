@@ -5,9 +5,11 @@ import (
 	"errors"
 	"log"
 	"log/slog"
+	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
+	"sync/atomic"
 	"syscall"
 	"time"
 
@@ -57,6 +59,61 @@ func main() {
 		log.Fatalf("connect to Redis: %v", err)
 	}
 
+	var ready atomic.Bool
+
+	healthServer := &http.Server{
+		Addr:              envOrDefault("HEALTH_ADDR", ":8084"),
+		ReadHeaderTimeout: 2 * time.Second,
+		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			switch r.URL.Path {
+			case "/healthz":
+				w.WriteHeader(http.StatusOK)
+				_, _ = w.Write([]byte("ok"))
+
+			case "/readyz":
+				if !ready.Load() {
+					http.Error(w, "not ready", http.StatusServiceUnavailable)
+					return
+				}
+
+				checkCtx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+				defer cancel()
+
+				if err := pgPool.Ping(checkCtx); err != nil {
+					http.Error(w, "database unavailable", http.StatusServiceUnavailable)
+					return
+				}
+
+				if err := redisClient.Ping(checkCtx).Err(); err != nil {
+					http.Error(w, "redis unavailable", http.StatusServiceUnavailable)
+					return
+				}
+
+				w.WriteHeader(http.StatusOK)
+				_, _ = w.Write([]byte("ready"))
+
+			default:
+				http.NotFound(w, r)
+			}
+		}),
+	}
+
+	go func() {
+		if err := healthServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logger.Error("health server stopped", "err", err)
+			stop()
+		}
+	}()
+
+	defer func() {
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		if err := healthServer.Shutdown(shutdownCtx); err != nil {
+			logger.Error("health server shutdown failed", "err", err)
+		}
+	}()
+
 	sitesRepo := repo.NewSites(pgPool, logger)
 	statsRepo := repo.NewStats(pgPool, logger)
 	redisStatsRepo := repo.NewRedisStats(redisClient, retention)
@@ -82,9 +139,13 @@ func main() {
 		"redis_retention", retention.String(),
 	)
 
+	ready.Store(true)
+
 	if err := checker.Run(ctx); err != nil && !errors.Is(err, context.Canceled) {
 		log.Fatalf("checker service stopped: %v", err)
 	}
+
+	ready.Store(false)
 
 	logger.Info("checker service stopped")
 }

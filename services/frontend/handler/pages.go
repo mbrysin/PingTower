@@ -13,6 +13,14 @@ func New() *Handler {
 }
 
 func (h *Handler) RegisterRoutes(r *gin.Engine) {
+	r.GET("/healthz", func(c *gin.Context) {
+		c.Status(http.StatusOK)
+	})
+
+	r.GET("/readyz", func(c *gin.Context) {
+		c.Status(http.StatusOK)
+	})
+
 	r.LoadHTMLGlob("services/frontend/templates/*")
 	r.Static("/static", "services/frontend/static")
 

@@ -12,9 +12,9 @@
   --color-accent-hover: #0191fe;
   --color-danger: #ff4245;
   --color-success: #30d057;
-  --color-muted: #6e6e73;
+  --color-muted: #a1a1a6;
   --color-border: #d2d2d7;
-  --color-header-bg: rgba(66, 66, 69, .8);
+  --color-header-bg: rgba(245, 245, 247, .8);
 
   --space-1: 4px;
   --space-2: 8px;
@@ -23,6 +23,8 @@
 
   --radius-control: 980px;
   --radius-card: 22px;
+
+  transition: color 160ms ease;
 }
 
 :root[data-theme="dark"] {
@@ -38,6 +40,8 @@
   --color-muted: #a1a1a6;
   --color-border: #424245;
   --color-header-bg: rgba(29, 29, 31, .8);
+
+  transition: color 160ms ease;
 }
 
 html {
@@ -77,13 +81,23 @@ main {
 
 .site-header a,
 .site-header button {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(0, 0, 0, 0.8);
   transition: color 160ms ease;
+}
+
+:root[data-theme="dark"] .site-header a,
+:root[data-theme="dark"] .site-header button {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .site-header a:hover,
 .site-header button:hover {
-  color: #FFFFFF;
+  color: #000000;
+}
+
+:root[data-theme="dark"] .site-header a:hover,
+:root[data-theme="dark"] .site-header button:hover {
+  color: #ffffff;
 }
 
 .site-header a,
@@ -161,6 +175,10 @@ main {
   grid-row: 3;
   margin: 0;
   font-size: 14px;
+}
+
+.tile__response-unit {
+  color: #98989e;
 }
 
 .tile__last-check {
@@ -274,5 +292,18 @@ main {
 @media (max-width: 380px) {
   .tile-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+
+@media (min-width: 1400px) {
+  .tile-grid {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 2000px) {
+  .tile-grid {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
   }
 }
