@@ -31,6 +31,11 @@ pingtower is a website monitoring service. visitors can view website statuses an
 - **infrastructure:** docker + docker compose
 - **testing and ci:** go test + github actions
 
+## preview
+
+![PingTower dashboard dark theme](docs/screenshots/dashboard_dark_theme.png)
+![PingTower dashboard light theme](docs/screenshots/dashboard_light_theme.png)
+
 ## components
 
 - [x] **sites** — manages monitored websites.
@@ -38,8 +43,3 @@ pingtower is a website monitoring service. visitors can view website statuses an
 - [x] **nginx** — reverse proxy and entry point for the services.
 - [x] **stats** — serves historical statistics and chart data.
 - [x] **frontend** — displays statuses, charts, and incident reports.
-
-## preview
-
-![PingTower dashboard dark theme](docs/screenshots/dashboard_dark_theme.png)
-![PingTower dashboard light theme](docs/screenshots/dashboard_light_theme.png)
