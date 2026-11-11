@@ -196,3 +196,50 @@ func (r *Stats) GetLatest(
 
 	return &stat, nil
 }
+
+func (r *Stats) GetLatestForSites(
+	ctx context.Context,
+	siteIDs []int,
+) (map[int]model.Stat, error) {
+	result := make(map[int]model.Stat, len(siteIDs))
+	if len(siteIDs) == 0 {
+		return result, nil
+	}
+
+	const q = `
+		SELECT DISTINCT ON (site_id)
+		       id, site_id, checked_at, is_up, status_code,
+		       response_time_ms, error
+		FROM stat
+		WHERE site_id = ANY($1)
+		ORDER BY site_id, checked_at DESC, id DESC
+	`
+
+	rows, err := r.db.Query(ctx, q, siteIDs)
+	if err != nil {
+		return nil, fmt.Errorf("get latest stats for sites: %w", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var stat model.Stat
+		if err := rows.Scan(
+			&stat.ID,
+			&stat.SiteID,
+			&stat.CheckedAt,
+			&stat.IsUp,
+			&stat.StatusCode,
+			&stat.ResponseTimeMs,
+			&stat.Error,
+		); err != nil {
+			return nil, fmt.Errorf("scan latest stat: %w", err)
+		}
+		result[stat.SiteID] = stat
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate latest stats: %w", err)
+	}
+
+	return result, nil
+}

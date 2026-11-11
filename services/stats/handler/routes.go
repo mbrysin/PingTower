@@ -3,6 +3,10 @@ package handler
 import "github.com/gin-gonic/gin"
 
 func (h *Handler) RegisterRoutes(router *gin.Engine) {
+	router.GET("/stats/latest-stats", func(c *gin.Context) {
+		h.GetLatestForSites(c.Writer, c.Request)
+	})
+
 	router.GET("/sites/:siteID/stats", func(c *gin.Context) {
 		c.Request.SetPathValue("siteID", c.Param("siteID"))
 		h.GetStatsBetween(c.Writer, c.Request)

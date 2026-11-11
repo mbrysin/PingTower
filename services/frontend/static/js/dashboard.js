@@ -4,7 +4,7 @@ const grid = document.querySelector("#tile-grid");
 const statusMessage = document.querySelector("#status-message");
 const loadMoreButton = document.querySelector("#load-more");
 if (!grid || !statusMessage || !loadMoreButton) {
-    throw new Error("Dashboard: не найдены необходимые элементы страницы");
+    throw new Error("Dashboard: not found needed page's elements");
 }
 let offset = 0;
 let isLoading = false;
@@ -14,54 +14,58 @@ async function loadSites() {
         return;
     isLoading = true;
     loadMoreButton.disabled = true;
-    statusMessage.textContent = "Загружаем сайты…";
+    statusMessage.textContent = "Загрузка…";
     const params = new URLSearchParams({
         limit: String(PAGE_SIZE),
         offset: String(offset),
     });
     try {
-        const response = await fetch(`/sites?${params.toString()}`, {
+        const sitesResponse = await fetch(`/sites?${params.toString()}`, {
             headers: { Accept: "application/json" },
         });
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+        if (!sitesResponse.ok) {
+            throw new Error(`Ошибка загрузки сайтов: HTTP ${sitesResponse.status}`);
         }
-        const sites = await response.json();
-        const sitesWithStats = await Promise.all(sites.map(async (site) => {
-            try {
-                return { site, latestStat: await getLatestStat(site.id) };
-            }
-            catch (error) {
-                console.error(`Latest-stat request failed for site ${site.id}:`, error);
-                return { site, latestStat: null };
-            }
-        }));
+        const sites = await sitesResponse.json();
         if (sites.length === 0 && offset === 0) {
             statusMessage.textContent = "Сайтов пока нет.";
             loadMoreButton.hidden = true;
             return;
         }
+        let latestStats = {};
+        if (sites.length > 0) {
+            const statsParams = new URLSearchParams({
+                site_ids: sites.map((site) => site.id).join(","),
+            });
+            const statsResponse = await fetch(`/stats/latest-stats?${statsParams.toString()}`, { headers: { Accept: "application/json" } });
+            if (!statsResponse.ok) {
+                throw new Error(`Ошибка загрузки статистики: HTTP ${statsResponse.status}`);
+            }
+            latestStats = await statsResponse.json();
+        }
         const fragment = document.createDocumentFragment();
-        for (const { site, latestStat } of sitesWithStats) {
+        for (const site of sites) {
+            const latestStat = latestStats[String(site.id)] ?? null;
             const tile = document.createElement("article");
             tile.className = "tile";
-            const title = document.createElement("h2");
+            const title = document.createElement("a");
             title.className = "tile__title";
             title.textContent = site.name;
+            title.href = `/site/${encodeURIComponent(site.id)}`;
             const statusDot = document.createElement("span");
             statusDot.className = "tile__status-dot";
             statusDot.setAttribute("role", "img");
             if (!latestStat) {
                 statusDot.classList.add("tile__status-dot--unknown");
-                statusDot.setAttribute("aria-label", "No data");
+                statusDot.setAttribute("aria-label", "Нет данных");
             }
             else if (latestStat.is_up) {
                 statusDot.classList.add("tile__status-dot--up");
-                statusDot.setAttribute("aria-label", "Available");
+                statusDot.setAttribute("aria-label", "Доступен");
             }
             else {
                 statusDot.classList.add("tile__status-dot--down");
-                statusDot.setAttribute("aria-label", "Unavailable");
+                statusDot.setAttribute("aria-label", "Недоступен");
             }
             const responseTime = document.createElement("p");
             responseTime.className = "tile__response-time";
@@ -79,8 +83,8 @@ async function loadSites() {
             const lastCheck = document.createElement("p");
             lastCheck.className = "tile__last-check";
             lastCheck.textContent = latestStat
-                ? `Checked at: ${new Date(latestStat.checked_at).toLocaleString()}`
-                : "No data";
+                ? `Проверено: ${new Date(latestStat.checked_at).toLocaleString()}`
+                : "Нет данных";
             tile.append(title, statusDot, responseTime, lastCheck);
             fragment.appendChild(tile);
         }
@@ -97,7 +101,7 @@ async function loadSites() {
     }
     finally {
         isLoading = false;
-        loadMoreButton.disabled = false;
+        loadMoreButton.disabled = !hasMore;
     }
 }
 loadMoreButton.addEventListener("click", () => {
@@ -114,12 +118,4 @@ if (themeToggle) {
         document.documentElement.dataset.theme = nextTheme;
         localStorage.setItem("theme", nextTheme);
     });
-}
-async function getLatestStat(siteID) {
-    const response = await fetch(`/stats/sites/${encodeURIComponent(siteID)}/latest-stat`, { headers: { Accept: "application/json" } });
-    if (!response.ok) {
-        const body = await response.text();
-        throw new Error(`HTTP ${response.status}: ${body}`);
-    }
-    return response.json();
 }

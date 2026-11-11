@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/mbrysin/PingTower/services/stats/model"
@@ -29,6 +30,11 @@ type StatsService interface {
 		ctx context.Context,
 		siteID int,
 	) (*model.Stat, error)
+
+	GetLatestForSites(
+		ctx context.Context,
+		siteIDs []int,
+	) (map[int]model.Stat, error)
 }
 
 type Handler struct {
@@ -149,4 +155,36 @@ func (h *Handler) GetLatest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusOK, stat)
+}
+
+func (h *Handler) GetLatestForSites(w http.ResponseWriter, r *http.Request) {
+	rawIDs := r.URL.Query().Get("site_ids")
+	if rawIDs == "" {
+		http.Error(w, "site_ids is required", http.StatusBadRequest)
+		return
+	}
+
+	parts := strings.Split(rawIDs, ",")
+	if len(parts) > 100 {
+		http.Error(w, "at most 100 site_ids are allowed", http.StatusBadRequest)
+		return
+	}
+
+	siteIDs := make([]int, 0, len(parts))
+	for _, part := range parts {
+		id, err := strconv.Atoi(strings.TrimSpace(part))
+		if err != nil || id <= 0 {
+			http.Error(w, "site_ids must be comma-separated positive integers", http.StatusBadRequest)
+			return
+		}
+		siteIDs = append(siteIDs, id)
+	}
+
+	stats, err := h.service.GetLatestForSites(r.Context(), siteIDs)
+	if err != nil {
+		http.Error(w, "failed to get latest stats", http.StatusInternalServerError)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, stats)
 }

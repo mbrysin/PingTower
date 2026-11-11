@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ .title }}</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body data-site-id="{{ .siteID }}">
+  <header class="site-header">
+    <a class="site-name" href="/"><strong>PingTower</strong></a>
+    <a href="/">All sites</a>
+    <button class="button--primary" id="theme-toggle" type="button">
+      Change theme
+    </button>
+  </header>
+
+  <main class="site-page">
+    <section aria-labelledby="site-name">
+      <h1 id="site-name" class="site-page__title">Loading…</h1>
+
+      <a
+        id="site-url"
+        class="site-page__url"
+        target="_blank"
+        rel="noopener noreferrer"
+      ></a>
+
+      <p id="site-status" class="site-page__last-check">Loading…</p>
+      <p id="site-response-time" class="site-page__response-time">—</p>
+      <p id="site-last-check" class="site-page__last-check"></p>
+    </section>
+
+    <section class="site-page__chart" aria-labelledby="history-title">
+      <h2 id="history-title">Response time history</h2>
+      <div class="chart-frame">
+        <div class="chart-scroll" id="chart-scroll">
+          <div class="chart-inner">
+            <canvas id="site-stats-chart" aria-label="Response time history chart"></canvas>
+          </div>
+        </div>
+
+        <div id="chart-y-axis" class="chart-y-axis" aria-hidden="true"></div>
+        <div id="chart-tooltip" class="chart-tooltip" role="status" hidden></div>
+      </div>
+      <p id="chart-message" class="tile__last-check" role="status"></p>
+      <p id="chart-message" class="tile__last-check" role="status"></p>
+    </section>
+
+    <p id="site-error" class="site-page__last-check" role="status"></p>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <span>Copyright © 2026 PingTower</span>
+      <nav aria-label="Footer links">
+        <a href="/about">About project</a>
+        <a href="/contact">Contact</a>
+      </nav>
+      <span>Russia</span>
+    </div>
+  </footer>
+
+  <script src="/static/js/site.js" defer></script>
+</body>
+</html>

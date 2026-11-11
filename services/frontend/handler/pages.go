@@ -25,10 +25,18 @@ func (h *Handler) RegisterRoutes(r *gin.Engine) {
 	r.Static("/static", "services/frontend/static")
 
 	r.GET("/", h.Dashboard)
+	r.GET("/site/:siteID", h.Site)
 }
 
 func (h *Handler) Dashboard(c *gin.Context) {
 	c.HTML(http.StatusOK, "dashboard.html", gin.H{
 		"title": "PingTower — Dashboard",
+	})
+}
+
+func (h *Handler) Site(c *gin.Context) {
+	c.HTML(http.StatusOK, "site.html", gin.H{
+		"title":  "PingTower — Site",
+		"siteID": c.Param("siteID"),
 	})
 }

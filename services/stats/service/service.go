@@ -24,6 +24,8 @@ type StatsRepository interface {
 	) ([]model.DailyStat, error)
 
 	GetLatest(ctx context.Context, siteID int) (*model.Stat, error)
+
+	GetLatestForSites(ctx context.Context, siteIDs []int) (map[int]model.Stat, error)
 }
 
 type RedisStatsRepository interface {
@@ -110,4 +112,22 @@ func (s *Stats) GetLatest(
 	}
 
 	return stat, nil
+}
+
+func (s *Stats) GetLatestForSites(
+	ctx context.Context,
+	siteIDs []int,
+) (map[int]model.Stat, error) {
+	seen := make(map[int]struct{}, len(siteIDs))
+	for _, id := range siteIDs {
+		if id <= 0 {
+			return nil, fmt.Errorf("site_id must be positive")
+		}
+		if _, exists := seen[id]; exists {
+			return nil, fmt.Errorf("duplicate site_id: %d", id)
+		}
+		seen[id] = struct{}{}
+	}
+
+	return s.repo.GetLatestForSites(ctx, siteIDs)
 }
