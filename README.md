@@ -35,6 +35,8 @@ pingtower is a website monitoring service. visitors can view website statuses an
 
 ![PingTower dashboard dark theme](docs/screenshots/dashboard_dark_theme.png)
 ![PingTower dashboard light theme](docs/screenshots/dashboard_light_theme.png)
+![PingTower site dark theme](docs/screenshots/site_dark_theme.png)
+![PingTower site light theme](docs/screenshots/site_light_theme.png)
 
 ## components
 
