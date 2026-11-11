@@ -79,9 +79,13 @@ main {
   backdrop-filter: saturate(180%) blur(20px);
 }
 
-.site-header a,
-.site-header button {
+.site-header a{
   color: rgba(0, 0, 0, 0.8);
+  transition: color 160ms ease;
+}
+
+.site-header button {
+  color: rgba(255, 255, 255, 0.8);
   transition: color 160ms ease;
 }
 
@@ -90,9 +94,12 @@ main {
   color: rgba(255, 255, 255, 0.8);
 }
 
-.site-header a:hover,
-.site-header button:hover {
+.site-header a:hover {
   color: #000000;
+}
+
+.site-header button:hover {
+  color: #ffffff;
 }
 
 :root[data-theme="dark"] .site-header a:hover,
