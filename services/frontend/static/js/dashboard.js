@@ -43,9 +43,19 @@ async function loadSites() {
             }
             latestStats = await statsResponse.json();
         }
+        const sortedSites = sites
+            .map((site, index) => ({
+            site,
+            index,
+            latestStat: latestStats[String(site.id)] ?? null,
+        }))
+            .sort((a, b) => {
+            const statusOrder = Number(a.latestStat?.is_up === true) -
+                Number(b.latestStat?.is_up === true);
+            return statusOrder || a.index - b.index;
+        });
         const fragment = document.createDocumentFragment();
-        for (const site of sites) {
-            const latestStat = latestStats[String(site.id)] ?? null;
+        for (const { site, latestStat } of sortedSites) {
             const tile = document.createElement("article");
             tile.className = "tile";
             const title = document.createElement("a");
