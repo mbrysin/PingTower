@@ -3,7 +3,7 @@ package handler
 import "github.com/gin-gonic/gin"
 
 func (h *Handler) RegisterRoutes(router *gin.Engine) {
-	router.GET("/stats/latest-stats", func(c *gin.Context) {
+	router.GET("/sites/latest-stats", func(c *gin.Context) {
 		h.GetLatestForSites(c.Writer, c.Request)
 	})
 

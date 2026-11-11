@@ -66,7 +66,7 @@ async function loadSites(): Promise<void> {
       });
 
       const statsResponse = await fetch(
-        `/stats/latest-stats?${statsParams.toString()}`,
+        `/stats/sites/latest-stats?${statsParams.toString()}`,
         { headers: { Accept: "application/json" } },
       );
 

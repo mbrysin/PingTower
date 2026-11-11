@@ -37,7 +37,7 @@ async function loadSites() {
             const statsParams = new URLSearchParams({
                 site_ids: sites.map((site) => site.id).join(","),
             });
-            const statsResponse = await fetch(`/stats/latest-stats?${statsParams.toString()}`, { headers: { Accept: "application/json" } });
+            const statsResponse = await fetch(`/stats/sites/latest-stats?${statsParams.toString()}`, { headers: { Accept: "application/json" } });
             if (!statsResponse.ok) {
                 throw new Error(`Ошибка загрузки статистики: HTTP ${statsResponse.status}`);
             }
