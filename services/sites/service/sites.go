@@ -17,8 +17,11 @@ const (
 	maxSiteURLBytes   = 2048
 )
 
-var ErrInvalidSite = errors.New("invalid site")
-var ErrSiteNotFound = errors.New("site not found")
+var (
+	ErrInvalidSite  = errors.New("invalid site")
+	ErrSiteNotFound = errors.New("site not found")
+	ErrSiteExists   = errors.New("site exists")
+)
 
 type SiteRepository interface {
 	CreateSite(ctx context.Context, site *model.Site) (*model.Site, error)
