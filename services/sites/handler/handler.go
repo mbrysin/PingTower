@@ -12,7 +12,7 @@ import (
 )
 
 type SitesService interface {
-	Create(ctx context.Context, site *model.Site) (*model.Site, error)
+	Create(ctx context.Context, name, rawURL string) (*model.Site, error)
 	Get(ctx context.Context, id int) (*model.Site, error)
 	List(ctx context.Context, limit, offset int) ([]model.Site, error)
 	UpdateName(ctx context.Context, id int, name string) (*model.Site, error)
@@ -40,10 +40,7 @@ func (h *Handler) Create(c *gin.Context) {
 		return
 	}
 
-	site, err := h.sites.Create(c.Request.Context(), &model.Site{
-		Name: req.Name,
-		URL:  req.URL,
-	})
+	site, err := h.sites.Create(c.Request.Context(), req.Name, req.URL)
 	if err != nil {
 		if errors.Is(err, service.ErrSiteExists) {
 			c.JSON(http.StatusConflict, gin.H{"error": "site already exists"})
