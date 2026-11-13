@@ -9,15 +9,12 @@
 <body data-site-id="{{ .siteID }}">
   <header class="site-header">
     <a class="site-name" href="/"><strong>PingTower</strong></a>
-    <a href="/">All sites</a>
-    <button class="button--primary" id="theme-toggle" type="button">
-      Change theme
-    </button>
+    <a href="/">all sites</a>
   </header>
 
   <main class="site-page">
     <section aria-labelledby="site-name">
-      <h1 id="site-name" class="site-page__title">Loading…</h1>
+      <h1 id="site-name" class="site-page__title">loading…</h1>
 
       <a
         id="site-url"
@@ -27,37 +24,80 @@
       ></a>
 
       <p id="site-status" class="site-page__last-check">Loading…</p>
-      <p id="site-response-time" class="site-page__response-time">—</p>
+      <p id="site-availability" class="site-page__response-time">—</p>
       <p id="site-last-check" class="site-page__last-check"></p>
     </section>
 
     <section class="site-page__chart" aria-labelledby="history-title">
-      <h2 id="history-title">Response time history</h2>
+      <h2 id="history-title">Availability history</h2>
+
+      <div class="chart-controls">
+        <label>
+          From
+          <input id="range-from" type="date">
+        </label>
+
+        <label>
+          To
+          <input id="range-to" type="date">
+        </label>
+
+        <button
+          class="button"
+          id="range-prev"
+          type="button"
+          aria-label="Previous 30 days"
+        >
+          ←
+        </button>
+
+        <button
+          class="button"
+          id="range-next"
+          type="button"
+          aria-label="Next 30 days"
+        >
+          →
+        </button>
+
+        <button class="button" id="range-reset" type="button">
+          Last 30 days
+        </button>
+      </div>
+
+      <p id="chart-mode" class="tile__last-check"></p>
+
       <div class="chart-frame">
         <div class="chart-scroll" id="chart-scroll">
           <div class="chart-inner">
-            <canvas id="site-stats-chart" aria-label="Response time history chart"></canvas>
+            <canvas
+              id="site-stats-chart"
+              aria-label="Site availability chart, in percent"
+            ></canvas>
           </div>
         </div>
 
-        <div id="chart-y-axis" class="chart-y-axis" aria-hidden="true"></div>
         <div id="chart-tooltip" class="chart-tooltip" role="status" hidden></div>
       </div>
-      <p id="chart-message" class="tile__last-check" role="status"></p>
+
       <p id="chart-message" class="tile__last-check" role="status"></p>
     </section>
 
     <p id="site-error" class="site-page__last-check" role="status"></p>
+
+    <button class="button" id="theme-toggle" type="button">
+      change theme
+    </button>
   </main>
 
   <footer class="site-footer">
     <div class="footer-content">
-      <span>Copyright © 2026 PingTower</span>
+      <span>copyright © 2026 PingTower</span>
       <nav aria-label="Footer links">
-        <a href="/about">About project</a>
-        <a href="/contact">Contact</a>
+        <a href="/about">about project</a>
+        <a href="/contact">contact</a>
       </nav>
-      <span>Russia</span>
+      <span>russia</span>
     </div>
   </footer>
 
