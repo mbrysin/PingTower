@@ -12,6 +12,7 @@ import (
 )
 
 type SitesService interface {
+	Create(ctx context.Context, site *model.Site) (*model.Site, error)
 	Get(ctx context.Context, id int) (*model.Site, error)
 	List(ctx context.Context, limit, offset int) ([]model.Site, error)
 	UpdateName(ctx context.Context, id int, name string) (*model.Site, error)
@@ -27,6 +28,32 @@ func New(sites SitesService) *Handler {
 	return &Handler{
 		sites: sites,
 	}
+}
+
+func (h *Handler) Create(c *gin.Context) {
+	var req struct {
+		Name string `json:"name" binding:"required"`
+		URL  string `json:"url" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		return
+	}
+
+	site, err := h.sites.Create(c.Request.Context(), &model.Site{
+		Name: req.Name,
+		URL:  req.URL,
+	})
+	if err != nil {
+		if errors.Is(err, service.ErrSiteExists) {
+			c.JSON(http.StatusConflict, gin.H{"error": "site already exists"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, site)
 }
 
 func (h *Handler) Get(c *gin.Context) {
