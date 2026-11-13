@@ -14,6 +14,9 @@ import (
 type SitesService interface {
 	Get(ctx context.Context, id int) (*model.Site, error)
 	List(ctx context.Context, limit, offset int) ([]model.Site, error)
+	UpdateName(ctx context.Context, id int, name string) (*model.Site, error)
+	SetEnabled(ctx context.Context, id int, enabled bool) (*model.Site, error)
+	Delete(ctx context.Context, id int) error
 }
 
 type Handler struct {
@@ -75,4 +78,79 @@ func (h *Handler) List(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, sites)
+}
+
+func (h *Handler) UpdateName(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil || id <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid site id"})
+		return
+	}
+
+	var req struct {
+		Name string `json:"name" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		return
+	}
+
+	site, err := h.sites.UpdateName(c.Request.Context(), id, req.Name)
+	if err != nil {
+		if errors.Is(err, service.ErrSiteNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "site not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, site)
+}
+
+func (h *Handler) SetEnabled(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil || id <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid site id"})
+		return
+	}
+
+	var req struct {
+		Enabled *bool `json:"enabled" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		return
+	}
+
+	site, err := h.sites.SetEnabled(c.Request.Context(), id, *req.Enabled)
+	if err != nil {
+		if errors.Is(err, service.ErrSiteNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "site not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, site)
+}
+
+func (h *Handler) Delete(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil || id <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid site id"})
+		return
+	}
+
+	if err := h.sites.Delete(c.Request.Context(), id); err != nil {
+		if errors.Is(err, service.ErrSiteNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "site not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }
